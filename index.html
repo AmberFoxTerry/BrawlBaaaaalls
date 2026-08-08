@@ -22,16 +22,13 @@
 <style>
 
 * {
-
     box-sizing: border-box;
-
     margin: 0;
     padding: 0;
 
     user-select: none;
     -webkit-user-select: none;
 }
-
 
 html,
 body {
@@ -61,6 +58,10 @@ body {
 }
 
 
+/* =========================
+   PLAYER INFO
+========================= */
+
 .player-info {
 
     position: absolute;
@@ -81,7 +82,6 @@ body {
     font-weight: bold;
 }
 
-
 .pfp {
 
     width: 50px;
@@ -96,7 +96,33 @@ body {
 
 
 /* =========================
-   MENU BALL
+   BC
+========================= */
+
+#coins {
+
+    position: absolute;
+
+    top: 20px;
+    right: 20px;
+
+    padding: 10px 16px;
+
+    border-radius: 15px;
+
+    background:
+        rgba(0,0,0,0.25);
+
+    color: #ffd83d;
+
+    font-size: 22px;
+
+    font-weight: bold;
+}
+
+
+/* =========================
+   CENTER BALL
 ========================= */
 
 .menu-ball {
@@ -114,56 +140,182 @@ body {
 
     border-radius: 50%;
 
-    background: #ff4444;
+    background: white;
+
+    box-shadow:
+        0 8px 20px
+        rgba(0,0,0,0.25);
+
+    cursor: pointer;
 }
 
 
 /* =========================
-   COLOR BUTTONS
+   BALL SELECTOR
 ========================= */
 
-.color-picker {
+#ballSelector {
 
     position: absolute;
 
     left: 50%;
-
-    bottom: 120px;
+    top: 50%;
 
     transform:
-        translateX(-50%);
+        translate(-50%, 80px);
 
-    display: flex;
+    display: none;
 
-    gap: 10px;
+    gap: 12px;
+
+    background:
+        rgba(0,0,0,0.35);
+
+    padding: 12px;
+
+    border-radius: 18px;
 }
 
+.ball-option {
 
-.color-button {
-
-    width: 32px;
-    height: 32px;
+    width: 65px;
+    height: 65px;
 
     border-radius: 50%;
 
     border: 3px solid
-        rgba(255,255,255,0.5);
+        rgba(255,255,255,0.4);
 
-    padding: 0;
+    background: white;
 }
 
-
-.color-button.selected {
+.ball-option.selected {
 
     border-color: white;
 
-    transform:
-        scale(1.2);
+    transform: scale(1.1);
 }
 
 
 /* =========================
-   PLAY BUTTON
+   BOWLING VISUAL
+========================= */
+
+.bowling-option {
+
+    background: #7d1717;
+
+    position: relative;
+}
+
+.bowling-option::before {
+
+    content: "";
+
+    position: absolute;
+
+    width: 8px;
+    height: 8px;
+
+    border-radius: 50%;
+
+    background: #111;
+
+    top: 18px;
+    left: 18px;
+
+    box-shadow:
+        15px 4px 0 #111,
+        8px 18px 0 #111;
+}
+
+
+/* =========================
+   PINGPONG VISUAL
+========================= */
+
+.pingpong-option {
+
+    background: #fff3a8;
+
+    width: 50px;
+    height: 50px;
+
+    margin: 7px;
+}
+
+
+/* =========================
+   SHOP
+========================= */
+
+#shop {
+
+    position: absolute;
+
+    left: 20px;
+    bottom: 20px;
+
+    width: 260px;
+
+    padding: 14px;
+
+    border-radius: 18px;
+
+    background:
+        rgba(0,0,0,0.30);
+
+    color: white;
+}
+
+#shop h2 {
+
+    margin-bottom: 10px;
+
+    font-size: 20px;
+}
+
+.shop-item {
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: space-between;
+
+    gap: 10px;
+
+    padding: 8px;
+
+    margin-top: 6px;
+
+    border-radius: 12px;
+
+    background:
+        rgba(255,255,255,0.12);
+}
+
+.shop-item button {
+
+    border: none;
+
+    border-radius: 9px;
+
+    padding: 8px 10px;
+
+    background: #ffd21f;
+
+    font-weight: bold;
+}
+
+.shop-item button:disabled {
+
+    opacity: 0.4;
+}
+
+
+/* =========================
+   PLAY
 ========================= */
 
 .start {
@@ -213,14 +365,12 @@ body {
     color: white;
 }
 
-
 #matching h1 {
 
     font-size: 40px;
 
     margin-bottom: 15px;
 }
-
 
 #matching p {
 
@@ -246,7 +396,6 @@ body {
 
     touch-action: none;
 }
-
 
 #camera {
 
@@ -296,9 +445,6 @@ body {
 
     position: absolute;
 
-    width: 70px;
-    height: 70px;
-
     border-radius: 50%;
 
     transform:
@@ -307,6 +453,65 @@ body {
     z-index: 10;
 
     pointer-events: none;
+
+    background: white;
+}
+
+
+/* Normal */
+
+.ball.normal {
+
+    width: 70px;
+    height: 70px;
+
+    background: white;
+}
+
+
+/* Bowling */
+
+.ball.bowling {
+
+    width: 90px;
+    height: 90px;
+
+    background: #7d1717;
+}
+
+
+/* Bowling holes */
+
+.ball.bowling::before {
+
+    content: "";
+
+    position: absolute;
+
+    width: 10px;
+    height: 10px;
+
+    border-radius: 50%;
+
+    background: #111;
+
+    top: 25px;
+    left: 25px;
+
+    box-shadow:
+        20px 5px 0 #111,
+        10px 22px 0 #111;
+}
+
+
+/* Ping pong */
+
+.ball.pingpong {
+
+    width: 50px;
+    height: 50px;
+
+    background: #fff3a8;
 }
 
 
@@ -320,7 +525,7 @@ body {
 
     left: 50%;
 
-    bottom: 78px;
+    bottom: calc(100% + 8px);
 
     transform:
         translateX(-50%);
@@ -335,8 +540,6 @@ body {
 
     text-shadow:
         0 2px 4px #000;
-
-    pointer-events: none;
 }
 
 
@@ -367,7 +570,6 @@ body {
 
     touch-action: none;
 }
-
 
 #stick {
 
@@ -413,7 +615,6 @@ body {
     z-index: 100;
 }
 
-
 #result h1 {
 
     font-size: 60px;
@@ -426,10 +627,6 @@ body {
 
 <body>
 
-
-<!-- =========================
-     MENU
-========================= -->
 
 <div id="menu">
 
@@ -447,55 +644,84 @@ body {
     </div>
 
 
+    <div id="coins">
+        0 BC
+    </div>
+
+
     <div
         id="menuBall"
         class="menu-ball"
+        onclick="toggleBallSelector()"
     ></div>
 
 
-    <div class="color-picker">
+    <div id="ballSelector">
 
         <button
-            class="color-button selected"
-            style="background:#ff4444"
-            data-color="#ff4444"
-            onclick="selectColor(this)"
+            id="normalOption"
+            class="ball-option selected"
+            onclick="selectBall('normal')"
         ></button>
 
         <button
-            class="color-button"
-            style="background:#44aaff"
-            data-color="#44aaff"
-            onclick="selectColor(this)"
+            id="bowlingOption"
+            class="ball-option bowling-option"
+            onclick="selectBall('bowling')"
         ></button>
 
         <button
-            class="color-button"
-            style="background:#44ff77"
-            data-color="#44ff77"
-            onclick="selectColor(this)"
+            id="pingpongOption"
+            class="ball-option pingpong-option"
+            onclick="selectBall('pingpong')"
         ></button>
 
-        <button
-            class="color-button"
-            style="background:#ff44dd"
-            data-color="#ff44dd"
-            onclick="selectColor(this)"
-        ></button>
+    </div>
 
-        <button
-            class="color-button"
-            style="background:#ffaa22"
-            data-color="#ffaa22"
-            onclick="selectColor(this)"
-        ></button>
 
-        <button
-            class="color-button"
-            style="background:#aa66ff"
-            data-color="#aa66ff"
-            onclick="selectColor(this)"
-        ></button>
+    <div id="shop">
+
+        <h2>
+            Baaaaall Shop
+        </h2>
+
+
+        <div class="shop-item">
+
+            <div>
+                Bowling Baaaaall<br>
+                <small>
+                    0.2 speed · 10 push
+                </small>
+            </div>
+
+            <button
+                id="buyBowling"
+                onclick="buyBall('bowling')"
+            >
+                250 BC
+            </button>
+
+        </div>
+
+
+        <div class="shop-item">
+
+            <div>
+                PingPong Baaaaall<br>
+                <small>
+                    0.6 speed · 0.6 push
+                </small>
+            </div>
+
+            <button
+                id="buyPingpong"
+                onclick="buyBall('pingpong')"
+            >
+                250 BC
+            </button>
+
+        </div>
 
     </div>
 
@@ -510,10 +736,6 @@ body {
 </div>
 
 
-<!-- =========================
-     MATCHING
-========================= -->
-
 <div id="matching">
 
     <h1>
@@ -526,10 +748,6 @@ body {
 
 </div>
 
-
-<!-- =========================
-     ARENA
-========================= -->
 
 <div id="arena">
 
@@ -549,10 +767,6 @@ body {
 </div>
 
 
-<!-- =========================
-     RESULT
-========================= -->
-
 <div id="result">
 
     <h1 id="resultText">
@@ -564,10 +778,6 @@ body {
 
 <script>
 
-
-/* =========================
-   TELEGRAM
-========================= */
 
 const tg =
     window.Telegram.WebApp;
@@ -628,53 +838,341 @@ if (user) {
 
 
 /* =========================
-   PLAYER COLOR
+   PLAYER DATA
 ========================= */
 
-let selectedColor =
-    "#ff4444";
+let coins = 0;
+
+let selectedBall = "normal";
+
+let ownedBalls = {
+    normal: true,
+    bowling: false,
+    pingpong: false
+};
 
 
-const menuBall =
-    document.getElementById(
-        "menuBall"
-    );
+/* =========================
+   CLOUD STORAGE
+========================= */
 
+function loadData() {
 
-menuBall.style.background =
-    selectedColor;
+    if (
+        !tg.CloudStorage
+    ) {
 
-
-function selectColor(button) {
-
-    selectedColor =
-        button.dataset.color;
-
-
-    menuBall.style.background =
-        selectedColor;
-
-
-    document
-        .querySelectorAll(
-            ".color-button"
-        )
-        .forEach(
-            element => {
-
-                element.classList.remove(
-                    "selected"
-                );
-
-            }
+        console.warn(
+            "Telegram CloudStorage unavailable"
         );
 
+        return;
 
-    button.classList.add(
-        "selected"
+    }
+
+
+    tg.CloudStorage.getItems(
+        [
+            "brawl_coins",
+            "brawl_owned",
+            "brawl_selected"
+        ],
+
+        (
+            error,
+            values
+        ) => {
+
+            if (error) {
+
+                console.warn(
+                    error
+                );
+
+                return;
+
+            }
+
+
+            if (
+                values.brawl_coins
+            ) {
+
+                coins =
+                    parseInt(
+                        values.brawl_coins
+                    ) || 0;
+
+            }
+
+
+            if (
+                values.brawl_owned
+            ) {
+
+                try {
+
+                    ownedBalls =
+                        JSON.parse(
+                            values.brawl_owned
+                        );
+
+                } catch {
+
+                    ownedBalls = {
+                        normal: true,
+                        bowling: false,
+                        pingpong: false
+                    };
+
+                }
+
+            }
+
+
+            if (
+                values.brawl_selected &&
+                ownedBalls[
+                    values.brawl_selected
+                ]
+            ) {
+
+                selectedBall =
+                    values.brawl_selected;
+
+            }
+
+
+            updateUI();
+
+        }
     );
 
 }
+
+
+function saveData() {
+
+    if (
+        !tg.CloudStorage
+    ) {
+
+        return;
+
+    }
+
+
+    tg.CloudStorage.setItem(
+        "brawl_coins",
+        String(coins)
+    );
+
+
+    tg.CloudStorage.setItem(
+        "brawl_owned",
+        JSON.stringify(
+            ownedBalls
+        )
+    );
+
+
+    tg.CloudStorage.setItem(
+        "brawl_selected",
+        selectedBall
+    );
+
+}
+
+
+/* =========================
+   UI
+========================= */
+
+function updateUI() {
+
+    document.getElementById(
+        "coins"
+    ).textContent =
+        coins + " BC";
+
+
+    const ball =
+        document.getElementById(
+            "menuBall"
+        );
+
+
+    ball.className =
+        "menu-ball";
+
+
+    if (
+        selectedBall ===
+        "bowling"
+    ) {
+
+        ball.classList.add(
+            "bowling-option"
+        );
+
+    }
+
+
+    if (
+        selectedBall ===
+        "pingpong"
+    ) {
+
+        ball.classList.add(
+            "pingpong-option"
+        );
+
+    }
+
+
+    document.getElementById(
+        "buyBowling"
+    ).disabled =
+        ownedBalls.bowling ||
+        coins < 250;
+
+
+    document.getElementById(
+        "buyPingpong"
+    ).disabled =
+        ownedBalls.pingpong ||
+        coins < 250;
+
+
+    document.getElementById(
+        "buyBowling"
+    ).textContent =
+        ownedBalls.bowling
+            ? "OWNED"
+            : "250 BC";
+
+
+    document.getElementById(
+        "buyPingpong"
+    ).textContent =
+        ownedBalls.pingpong
+            ? "OWNED"
+            : "250 BC";
+
+
+    document.getElementById(
+        "normalOption"
+    ).style.display =
+        ownedBalls.normal
+            ? "block"
+            : "none";
+
+
+    document.getElementById(
+        "bowlingOption"
+    ).style.display =
+        ownedBalls.bowling
+            ? "block"
+            : "none";
+
+
+    document.getElementById(
+        "pingpongOption"
+    ).style.display =
+        ownedBalls.pingpong
+            ? "block"
+            : "none";
+
+}
+
+
+function toggleBallSelector() {
+
+    const selector =
+        document.getElementById(
+            "ballSelector"
+        );
+
+
+    selector.style.display =
+        selector.style.display ===
+        "flex"
+            ? "none"
+            : "flex";
+
+}
+
+
+function selectBall(
+    type
+) {
+
+    if (
+        !ownedBalls[type]
+    ) {
+
+        return;
+
+    }
+
+
+    selectedBall =
+        type;
+
+
+    saveData();
+
+    updateUI();
+
+
+    document.getElementById(
+        "ballSelector"
+    ).style.display =
+        "none";
+
+}
+
+
+function buyBall(
+    type
+) {
+
+    if (
+        ownedBalls[type]
+    ) {
+
+        return;
+
+    }
+
+
+    if (
+        coins < 250
+    ) {
+
+        return;
+
+    }
+
+
+    coins -= 250;
+
+    ownedBalls[type] =
+        true;
+
+
+    saveData();
+
+    updateUI();
+
+}
+
+
+/* =========================
+   LOAD SAVED DATA
+========================= */
+
+loadData();
 
 
 /* =========================
@@ -702,9 +1200,9 @@ let cameraX = 0;
 
 let cameraY = 0;
 
-let cameraLimitX = 0;
+let cameraLimitX = 300;
 
-let cameraLimitY = 0;
+let cameraLimitY = 300;
 
 
 /* =========================
@@ -733,11 +1231,6 @@ function play() {
 
     socket.onopen = () => {
 
-        /*
-            Send BOTH name and
-            selected menu color.
-        */
-
         socket.send(
             JSON.stringify({
 
@@ -747,8 +1240,8 @@ function play() {
                 name:
                     playerName,
 
-                color:
-                    selectedColor
+                ball:
+                    selectedBall
 
             })
         );
@@ -817,9 +1310,22 @@ function play() {
                 "game_over"
             ) {
 
-                showResult(
+                const won =
                     data.winner ===
-                    myID
+                    myID;
+
+
+                if (won) {
+
+                    coins += 10;
+
+                    saveData();
+
+                }
+
+
+                showResult(
+                    won
                 );
 
             }
@@ -829,6 +1335,10 @@ function play() {
                 data.type ===
                 "opponent_left"
             ) {
+
+                coins += 10;
+
+                saveData();
 
                 showResult(true);
 
@@ -851,7 +1361,7 @@ function play() {
 
 
 /* =========================
-   START ARENA
+   ARENA
 ========================= */
 
 function startArena(
@@ -874,27 +1384,31 @@ function startArena(
 
 
     /*
-        Find our player using
-        the exact selected color
-        AND name.
+        First player in our
+        match list is identified
+        using our selected ball
+        and name.
     */
 
-    const mine =
+    let mine =
         list.find(
             player =>
                 player.name ===
                     playerName &&
-                player.color ===
-                    selectedColor
+                player.ball ===
+                    selectedBall
         );
 
 
-    if (mine) {
+    if (!mine) {
 
-        myID =
-            mine.id;
+        mine = list[0];
 
     }
+
+
+    myID =
+        mine.id;
 
 
     list.forEach(
@@ -927,22 +1441,6 @@ function startArena(
 
         }
     );
-
-
-    /*
-        Camera limits.
-
-        The visible arena is
-        600 x 600.
-
-        World radius = 300.
-    */
-
-    cameraLimitX =
-        300;
-
-    cameraLimitY =
-        300;
 
 
     if (players[myID]) {
@@ -981,17 +1479,8 @@ function createBall(
 
 
     ball.className =
-        "ball";
-
-
-    /*
-        This is the color sent
-        by the server from the
-        player's menu selection.
-    */
-
-    ball.style.background =
-        player.color;
+        "ball " +
+        player.ball;
 
 
     const name =
@@ -1026,7 +1515,7 @@ function createBall(
 
 
 /* =========================
-   UPDATE STATE
+   STATE
 ========================= */
 
 function updateState(
@@ -1047,18 +1536,15 @@ function updateState(
                 ].x =
                     player.x;
 
-
                 players[
                     player.id
                 ].y =
                     player.y;
 
-
                 players[
                     player.id
                 ].vx =
                     player.vx;
-
 
                 players[
                     player.id
@@ -1074,7 +1560,7 @@ function updateState(
 
 
 /* =========================
-   CAMERA + RENDER
+   CAMERA
 ========================= */
 
 function render() {
@@ -1104,10 +1590,6 @@ function render() {
     }
 
 
-    /*
-        Follow our ball.
-    */
-
     cameraX +=
         (
             me.x -
@@ -1122,30 +1604,6 @@ function render() {
         ) * 0.12;
 
 
-    /*
-        Keep camera inside arena.
-    */
-
-    cameraX =
-        Math.max(
-            -cameraLimitX,
-            Math.min(
-                cameraLimitX,
-                cameraX
-            )
-        );
-
-
-    cameraY =
-        Math.max(
-            -cameraLimitY,
-            Math.min(
-                cameraLimitY,
-                cameraY
-            )
-        );
-
-
     const centerX =
         arena.clientWidth / 2;
 
@@ -1153,16 +1611,6 @@ function render() {
     const centerY =
         arena.clientHeight / 2;
 
-
-    /*
-        PLATFORM
-
-        The platform is fixed
-        in world coordinates.
-
-        Only its screen position
-        changes because of camera.
-    */
 
     const platform =
         document.getElementById(
@@ -1183,10 +1631,6 @@ function render() {
             cameraY
         ) + "px";
 
-
-    /*
-        BALLS
-    */
 
     for (
         const id in players
@@ -1285,7 +1729,6 @@ function moveJoystick(
             dx /
             distance *
             JOYSTICK_MAX;
-
 
         ny =
             dy /
@@ -1432,14 +1875,17 @@ function showResult(
         "resultText"
     ).textContent =
         won
-            ? "YOU WIN!"
-            : "YOU LOSE!";
+            ? "YOU WIN! +10 BC"
+            : "YOU LOSE! +0 BC";
 
 
     document.getElementById(
         "result"
     ).style.display =
         "flex";
+
+
+    updateUI();
 
 
     setTimeout(
