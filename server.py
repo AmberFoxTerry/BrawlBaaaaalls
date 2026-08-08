@@ -54,17 +54,19 @@ class Room:
         p1.room = self
         p2.room = self
 
-        # TOP-DOWN ARENA
-        #
-        # Player 1 = bottom
-        # Player 2 = top
+        # =========================
+        # SPAWN POSITIONS
+        # =========================
 
+        # Player 1 = bottom
         p1.x = 0
         p1.y = 170
 
+        # Player 2 = top
         p2.x = 0
         p2.y = -170
 
+        # Make sure colors are different
         while p2.color == p1.color:
             p2.color = random.choice(COLORS)
 
@@ -80,6 +82,7 @@ async def send(player, data):
         )
 
     except Exception:
+
         pass
 
 
@@ -163,10 +166,8 @@ async def game_loop():
             if room.finished:
                 continue
 
-
             p1 = room.players[0]
             p2 = room.players[1]
-
 
             # =========================
             # MOVEMENT
@@ -178,10 +179,8 @@ async def game_loop():
                 player.y += player.vy
 
                 # Friction
-
                 player.vx *= 0.90
                 player.vy *= 0.90
-
 
             # =========================
             # BALL COLLISION
@@ -195,9 +194,7 @@ async def game_loop():
                 dy * dy
             ) ** 0.5
 
-
             BALL_DIAMETER = 70
-
 
             if (
                 distance > 0
@@ -212,7 +209,6 @@ async def game_loop():
                     distance
                 )
 
-
                 # Push balls apart
 
                 p1.x -= nx * overlap / 2
@@ -221,11 +217,11 @@ async def game_loop():
                 p2.x += nx * overlap / 2
                 p2.y += ny * overlap / 2
 
+                # =========================
+                # STRONG KNOCKBACK
+                # =========================
 
-                # Bounce / push force
-
-                push = 8
-
+                push = 8.0
 
                 p1.vx -= nx * push
                 p1.vy -= ny * push
@@ -233,15 +229,12 @@ async def game_loop():
                 p2.vx += nx * push
                 p2.vy += ny * push
 
-
             # =========================
             # PLATFORM EDGE
             # =========================
 
             PLATFORM_RADIUS = 300
-
             BALL_RADIUS = 35
-
 
             for player in room.players:
 
@@ -250,11 +243,11 @@ async def game_loop():
                     player.y ** 2
                 ) ** 0.5
 
-
-                # Ball has fallen
+                # Ball's EDGE reached
+                # the edge of the platform.
 
                 if distance > (
-                    PLATFORM_RADIUS +
+                    PLATFORM_RADIUS -
                     BALL_RADIUS
                 ):
 
@@ -262,13 +255,11 @@ async def game_loop():
 
                     room.finished = True
 
-
                     winner = (
                         p2
                         if player == p1
                         else p1
                     )
-
 
                     await broadcast(
                         room,
@@ -282,7 +273,6 @@ async def game_loop():
                                 player.id
                         }
                     )
-
 
             # =========================
             # SEND GAME STATE
@@ -317,11 +307,9 @@ async def game_loop():
 
                             for player
                             in room.players
-
                         ]
                     }
                 )
-
 
         await asyncio.sleep(
             1 / 60
@@ -336,7 +324,6 @@ async def websocket_handler(request):
 
     player = Player(websocket)
 
-
     try:
 
         async for message in websocket:
@@ -345,77 +332,109 @@ async def websocket_handler(request):
                 message.type !=
                 web.WSMsgType.TEXT
             ):
+
                 continue
 
+            try:
 
-            data = json.loads(
-                message.data
-            )
+                data = json.loads(
+                    message.data
+                )
 
+            except Exception:
+
+                continue
 
             # =========================
             # PLAYER INFO
             # =========================
 
-            if data["type"] == "player_info":
+            if data.get("type") == "player_info":
 
                 player.name = data.get(
                     "name",
                     "Player"
                 )
 
+                # =========================
+                # USE COLOR FROM MENU
+                # =========================
+
+                requested_color = data.get(
+                    "color"
+                )
+
+                if requested_color in COLORS:
+
+                    player.color = requested_color
 
             # =========================
             # PLAY
             # =========================
 
-            elif data["type"] == "play":
+            elif data.get("type") == "play":
 
                 await matchmaking(
                     player
                 )
 
-
             # =========================
             # MOVEMENT
             # =========================
 
-            elif data["type"] == "input":
+            elif data.get("type") == "input":
 
                 if player.room is None:
                     continue
 
+                try:
 
-                x = float(
-                    data.get("x", 0)
+                    x = float(
+                        data.get(
+                            "x",
+                            0
+                        )
+                    )
+
+                    y = float(
+                        data.get(
+                            "y",
+                            0
+                        )
+                    )
+
+                except Exception:
+
+                    continue
+
+                # Prevent ridiculous values
+
+                x = max(
+                    -1,
+                    min(1, x)
                 )
 
-                y = float(
-                    data.get("y", 0)
+                y = max(
+                    -1,
+                    min(1, y)
                 )
 
-
-                SPEED = 0.7
-
+                SPEED = 0.85
 
                 player.vx += x * SPEED
                 player.vy += y * SPEED
-
 
     finally:
 
         global waiting_player
 
-
         if waiting_player == player:
 
             waiting_player = None
 
-
         if player.room:
 
             room = player.room
-
 
             for other in room.players:
 
@@ -429,12 +448,10 @@ async def websocket_handler(request):
                         }
                     )
 
-
             rooms.pop(
                 room.id,
                 None
             )
-
 
     return websocket
 
@@ -443,17 +460,14 @@ async def start():
 
     app = web.Application()
 
-
     app.router.add_get(
         "/ws",
         websocket_handler
     )
 
-
     runner = web.AppRunner(app)
 
     await runner.setup()
-
 
     site = web.TCPSite(
         runner,
@@ -461,14 +475,11 @@ async def start():
         8080
     )
 
-
     await site.start()
-
 
     print(
         "Brawl Baaaaalls server running!"
     )
-
 
     await game_loop()
 
