@@ -1,6 +1,5 @@
 import asyncio
 import json
-import random
 import uuid
 
 from aiohttp import web
@@ -10,14 +9,25 @@ waiting_player = None
 rooms = {}
 
 
-COLORS = [
-    "#ff4444",
-    "#44aaff",
-    "#44ff77",
-    "#ff44dd",
-    "#ffaa22",
-    "#aa66ff"
-]
+BALLS = {
+    "normal": {
+        "speed": 0.45,
+        "push": 8.0,
+        "radius": 35
+    },
+
+    "bowling": {
+        "speed": 0.20,
+        "push": 10.0,
+        "radius": 45
+    },
+
+    "pingpong": {
+        "speed": 0.60,
+        "push": 0.6,
+        "radius": 25
+    }
+}
 
 
 class Player:
@@ -32,7 +42,7 @@ class Player:
 
         self.name = "Player"
 
-        self.color = random.choice(COLORS)
+        self.ball_type = "normal"
 
         self.x = 0
         self.y = 0
@@ -54,10 +64,6 @@ class Room:
         p1.room = self
         p2.room = self
 
-        # =========================
-        # SPAWN POSITIONS
-        # =========================
-
         # Player 1 = bottom
         p1.x = 0
         p1.y = 170
@@ -65,10 +71,6 @@ class Room:
         # Player 2 = top
         p2.x = 0
         p2.y = -170
-
-        # Make sure colors are different
-        while p2.color == p1.color:
-            p2.color = random.choice(COLORS)
 
         self.finished = False
 
@@ -112,7 +114,7 @@ async def make_match(p1, p2):
                 {
                     "id": p1.id,
                     "name": p1.name,
-                    "color": p1.color,
+                    "ball": p1.ball_type,
                     "x": p1.x,
                     "y": p1.y
                 },
@@ -120,7 +122,7 @@ async def make_match(p1, p2):
                 {
                     "id": p2.id,
                     "name": p2.name,
-                    "color": p2.color,
+                    "ball": p2.ball_type,
                     "x": p2.x,
                     "y": p2.y
                 }
@@ -178,7 +180,6 @@ async def game_loop():
                 player.x += player.vx
                 player.y += player.vy
 
-                # Friction
                 player.vx *= 0.90
                 player.vy *= 0.90
 
@@ -194,22 +195,28 @@ async def game_loop():
                 dy * dy
             ) ** 0.5
 
-            BALL_DIAMETER = 70
+            r1 = BALLS[
+                p1.ball_type
+            ]["radius"]
+
+            r2 = BALLS[
+                p2.ball_type
+            ]["radius"]
+
+            collision_distance = r1 + r2
 
             if (
                 distance > 0
-                and distance < BALL_DIAMETER
+                and distance < collision_distance
             ):
 
                 nx = dx / distance
                 ny = dy / distance
 
                 overlap = (
-                    BALL_DIAMETER -
+                    collision_distance -
                     distance
                 )
-
-                # Push balls apart
 
                 p1.x -= nx * overlap / 2
                 p1.y -= ny * overlap / 2
@@ -217,38 +224,40 @@ async def game_loop():
                 p2.x += nx * overlap / 2
                 p2.y += ny * overlap / 2
 
-                # =========================
-                # STRONG KNOCKBACK
-                # =========================
+                push1 = BALLS[
+                    p1.ball_type
+                ]["push"]
 
-                push = 8.0
+                push2 = BALLS[
+                    p2.ball_type
+                ]["push"]
 
-                p1.vx -= nx * push
-                p1.vy -= ny * push
+                p1.vx -= nx * push1
+                p1.vy -= ny * push1
 
-                p2.vx += nx * push
-                p2.vy += ny * push
+                p2.vx += nx * push2
+                p2.vy += ny * push2
 
             # =========================
-            # PLATFORM EDGE
+            # PLATFORM
             # =========================
 
             PLATFORM_RADIUS = 300
-            BALL_RADIUS = 35
 
             for player in room.players:
+
+                ball_radius = BALLS[
+                    player.ball_type
+                ]["radius"]
 
                 distance = (
                     player.x ** 2 +
                     player.y ** 2
                 ) ** 0.5
 
-                # Ball's EDGE reached
-                # the edge of the platform.
-
                 if distance > (
                     PLATFORM_RADIUS -
-                    BALL_RADIUS
+                    ball_radius
                 ):
 
                     player.alive = False
@@ -275,7 +284,7 @@ async def game_loop():
                     )
 
             # =========================
-            # SEND GAME STATE
+            # GAME STATE
             # =========================
 
             if not room.finished:
@@ -307,6 +316,7 @@ async def game_loop():
 
                             for player
                             in room.players
+
                         ]
                     }
                 )
@@ -356,17 +366,16 @@ async def websocket_handler(request):
                     "Player"
                 )
 
-                # =========================
-                # USE COLOR FROM MENU
-                # =========================
-
-                requested_color = data.get(
-                    "color"
+                requested_ball = data.get(
+                    "ball",
+                    "normal"
                 )
 
-                if requested_color in COLORS:
+                if requested_ball in BALLS:
 
-                    player.color = requested_color
+                    player.ball_type = (
+                        requested_ball
+                    )
 
             # =========================
             # PLAY
@@ -379,7 +388,7 @@ async def websocket_handler(request):
                 )
 
             # =========================
-            # MOVEMENT
+            # INPUT
             # =========================
 
             elif data.get("type") == "input":
@@ -407,8 +416,6 @@ async def websocket_handler(request):
 
                     continue
 
-                # Prevent ridiculous values
-
                 x = max(
                     -1,
                     min(1, x)
@@ -419,10 +426,12 @@ async def websocket_handler(request):
                     min(1, y)
                 )
 
-                SPEED = 0.45
+                speed = BALLS[
+                    player.ball_type
+                ]["speed"]
 
-                player.vx += x * SPEED
-                player.vy += y * SPEED
+                player.vx += x * speed
+                player.vy += y * speed
 
     finally:
 
