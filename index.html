@@ -3,155 +3,369 @@
 
 <head>
 
-    <meta charset="UTF-8">
+<meta charset="UTF-8">
 
-    <meta
-        name="viewport"
-        content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"
-    >
+<meta
+    name="viewport"
+    content="
+        width=device-width,
+        initial-scale=1.0,
+        maximum-scale=1.0,
+        user-scalable=no
+    "
+>
 
-    <title>Brawl Baaaaalls</title>
+<title>Brawl Baaaaalls</title>
 
-    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+<script src="https://telegram.org/js/telegram-web-app.js"></script>
 
-    <style>
 
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-        }
+<style>
 
-        html,
-        body {
+* {
 
-            width: 100%;
-            height: 100%;
+    box-sizing: border-box;
 
-            overflow: hidden;
+    margin: 0;
 
-            background: #2196f3;
+    padding: 0;
 
-            font-family: Arial, sans-serif;
-        }
+    user-select: none;
 
+    -webkit-user-select: none;
+}
 
-        #game {
 
-            position: fixed;
+html,
+body {
 
-            inset: 0;
+    width: 100%;
 
-            width: 100%;
-            height: 100%;
+    height: 100%;
 
-            overflow: hidden;
-        }
+    overflow: hidden;
 
+    background: #000;
 
-        /* PLAYER */
+    font-family: Arial, sans-serif;
+}
 
-        .player {
 
-            position: absolute;
+/* =========================
+   MENU
+========================= */
 
-            top: 15px;
-            left: 15px;
+#menu {
 
-            display: flex;
+    position: fixed;
 
-            align-items: center;
+    inset: 0;
 
-            gap: 10px;
+    background: #2196f3;
+}
 
-            color: white;
 
-            font-size: 18px;
+.player-info {
 
-            font-weight: bold;
+    position: absolute;
 
-            z-index: 10;
-        }
+    top: 15px;
 
+    left: 15px;
 
-        .pfp {
+    display: flex;
 
-            width: 50px;
-            height: 50px;
+    align-items: center;
 
-            border-radius: 50%;
+    gap: 10px;
 
-            object-fit: cover;
+    color: white;
 
-            background: white;
-        }
+    font-size: 18px;
 
+    font-weight: bold;
+}
 
-        /* BALL */
 
-        .ball {
+.pfp {
 
-            position: absolute;
+    width: 50px;
 
-            left: 50%;
-            top: 50%;
+    height: 50px;
 
-            transform: translate(-50%, -50%);
+    border-radius: 50%;
 
-            width: 110px;
-            height: 110px;
+    object-fit: cover;
 
-            background: white;
+    background: white;
+}
 
-            border-radius: 50%;
 
-            box-shadow:
-                0 8px 15px rgba(0, 0, 0, 0.2);
-        }
+.menu-ball {
 
+    position: absolute;
 
-        /* START BUTTON */
+    width: 110px;
 
-        .start-button {
+    height: 110px;
 
-            position: absolute;
+    left: 50%;
 
-            right: 30px;
-            bottom: 30px;
+    top: 50%;
 
-            width: 180px;
-            height: 70px;
+    transform:
+        translate(-50%, -50%);
 
-            border: none;
+    background: white;
 
-            border-radius: 18px;
+    border-radius: 50%;
+}
 
-            background: #ffd21f;
 
-            color: #222;
+.start {
 
-            font-size: 28px;
+    position: absolute;
 
-            font-weight: bold;
+    right: 30px;
 
-            cursor: pointer;
+    bottom: 30px;
 
-            box-shadow:
-                0 6px 0 #c9a500;
+    width: 180px;
 
-            z-index: 10;
-        }
+    height: 70px;
 
+    border: none;
 
-        .start-button:active {
+    border-radius: 18px;
 
-            transform: translateY(5px);
+    background: #ffd21f;
 
-            box-shadow:
-                0 1px 0 #c9a500;
-        }
+    font-size: 28px;
 
-    </style>
+    font-weight: bold;
+}
+
+
+/* =========================
+   MATCHING
+========================= */
+
+#matching {
+
+    position: fixed;
+
+    inset: 0;
+
+    display: none;
+
+    align-items: center;
+
+    justify-content: center;
+
+    flex-direction: column;
+
+    background: #000;
+
+    color: white;
+}
+
+
+#matching h1 {
+
+    font-size: 40px;
+
+    margin-bottom: 15px;
+}
+
+
+#matching p {
+
+    font-size: 26px;
+}
+
+
+/* =========================
+   ARENA
+========================= */
+
+#arena {
+
+    position: fixed;
+
+    inset: 0;
+
+    display: none;
+
+    background: #000;
+
+    overflow: hidden;
+}
+
+
+/* =========================
+   PLATFORM
+========================= */
+
+.platform {
+
+    position: absolute;
+
+    width: 800px;
+
+    height: 800px;
+
+    left: 50%;
+
+    top: 50%;
+
+    transform:
+        translate(-50%, -50%);
+
+    border-radius: 50%;
+
+    background: #666;
+
+    box-shadow:
+        0 0 0 8px #444;
+}
+
+
+/* =========================
+   BALL
+========================= */
+
+.ball {
+
+    position: absolute;
+
+    width: 70px;
+
+    height: 70px;
+
+    border-radius: 50%;
+
+    transform:
+        translate(-50%, -50%);
+
+    z-index: 5;
+
+    box-shadow:
+        inset -8px -8px 12px
+        rgba(0,0,0,0.25),
+
+        inset 6px 6px 10px
+        rgba(255,255,255,0.25);
+}
+
+
+.ball-name {
+
+    position: absolute;
+
+    bottom: 76px;
+
+    left: 50%;
+
+    transform:
+        translateX(-50%);
+
+    color: white;
+
+    font-size: 15px;
+
+    font-weight: bold;
+
+    white-space: nowrap;
+
+    text-shadow:
+        0 2px 4px #000;
+}
+
+
+/* =========================
+   JOYSTICK
+========================= */
+
+#joystick {
+
+    position: fixed;
+
+    left: 35px;
+
+    bottom: 35px;
+
+    width: 130px;
+
+    height: 130px;
+
+    border-radius: 50%;
+
+    background:
+        rgba(255,255,255,0.15);
+
+    border:
+        3px solid
+        rgba(255,255,255,0.3);
+
+    z-index: 20;
+
+    touch-action: none;
+}
+
+
+#stick {
+
+    position: absolute;
+
+    left: 50%;
+
+    top: 50%;
+
+    width: 60px;
+
+    height: 60px;
+
+    transform:
+        translate(-50%, -50%);
+
+    border-radius: 50%;
+
+    background:
+        rgba(255,255,255,0.6);
+}
+
+
+/* =========================
+   RESULT
+========================= */
+
+#result {
+
+    position: fixed;
+
+    inset: 0;
+
+    display: none;
+
+    align-items: center;
+
+    justify-content: center;
+
+    background:
+        rgba(0,0,0,0.85);
+
+    color: white;
+
+    z-index: 100;
+}
+
+
+#result h1 {
+
+    font-size: 60px;
+}
+
+</style>
 
 </head>
 
@@ -159,121 +373,800 @@
 <body>
 
 
-    <div id="game">
+<!-- =========================
+     MENU
+========================= -->
 
+<div id="menu">
 
-        <!-- PLAYER -->
+    <div class="player-info">
 
-        <div class="player">
-
-            <img
-                id="pfp"
-                class="pfp"
-                alt=""
-            >
-
-            <span id="playerName">
-                Player
-            </span>
-
-        </div>
-
-
-        <!-- BALL -->
-
-        <div class="ball"></div>
-
-
-        <!-- START -->
-
-        <button
-            class="start-button"
-            onclick="startGame()"
+        <img
+            id="pfp"
+            class="pfp"
         >
-            START
-        </button>
 
+        <span id="playerName">
+            Player
+        </span>
 
     </div>
 
 
-    <script>
-
-        const tg = window.Telegram.WebApp;
+    <div class="menu-ball"></div>
 
 
-        // Tell Telegram the game is ready
+    <button
+        class="start"
+        onclick="play()"
+    >
+        PLAY
+    </button>
 
-        tg.ready();
-
-
-        // Expand the Mini App
-
-        tg.expand();
-
-
-        // Request fullscreen
-
-        if (tg.requestFullscreen) {
-
-            tg.requestFullscreen();
-
-        }
+</div>
 
 
-        // =========================
-        // TELEGRAM PLAYER
-        // =========================
+<!-- =========================
+     MATCHING
+========================= -->
 
-        const user =
-            tg.initDataUnsafe?.user;
+<div id="matching">
+
+    <h1>Matching...</h1>
+
+    <p id="matchCount">
+        1/2
+    </p>
+
+</div>
 
 
-        if (user) {
+<!-- =========================
+     ARENA
+========================= -->
 
-            let name =
-                user.first_name || "Player";
+<div id="arena">
+
+    <div class="platform"></div>
 
 
-            if (user.last_name) {
+    <div id="joystick">
 
-                name +=
-                    " " + user.last_name;
+        <div id="stick"></div>
+
+    </div>
+
+</div>
+
+
+<!-- =========================
+     RESULT
+========================= -->
+
+<div id="result">
+
+    <h1 id="resultText">
+        YOU WIN!
+    </h1>
+
+</div>
+
+
+<script>
+
+
+/* =========================
+   TELEGRAM
+========================= */
+
+const tg =
+    window.Telegram.WebApp;
+
+
+tg.ready();
+
+tg.expand();
+
+
+if (tg.requestFullscreen) {
+
+    tg.requestFullscreen();
+
+}
+
+
+const user =
+    tg.initDataUnsafe?.user;
+
+
+let playerName =
+    "Player";
+
+
+if (user) {
+
+    playerName =
+        user.first_name ||
+        "Player";
+
+
+    if (user.last_name) {
+
+        playerName +=
+            " " +
+            user.last_name;
+
+    }
+
+
+    document.getElementById(
+        "playerName"
+    ).textContent =
+        playerName;
+
+
+    if (user.photo_url) {
+
+        document.getElementById(
+            "pfp"
+        ).src =
+            user.photo_url;
+
+    }
+
+}
+
+
+/* =========================
+   SERVER
+========================= */
+
+
+/*
+    PUT YOUR SERVER ADDRESS HERE.
+
+    Example:
+
+    wss://example.com/ws
+*/
+
+
+const SERVER_URL =
+    "wss://YOUR-SERVER/ws";
+
+
+let socket = null;
+
+let myID = null;
+
+let players = {};
+
+let running = false;
+
+
+/* =========================
+   PLAY
+========================= */
+
+function play() {
+
+    document.getElementById(
+        "menu"
+    ).style.display =
+        "none";
+
+
+    document.getElementById(
+        "matching"
+    ).style.display =
+        "flex";
+
+
+    socket =
+        new WebSocket(
+            SERVER_URL
+        );
+
+
+    socket.onopen = () => {
+
+
+        socket.send(
+            JSON.stringify({
+
+                type:
+                    "player_info",
+
+                name:
+                    playerName
+
+            })
+        );
+
+
+        socket.send(
+            JSON.stringify({
+
+                type:
+                    "play"
+
+            })
+        );
+
+    };
+
+
+    socket.onmessage =
+        event => {
+
+            const data =
+                JSON.parse(
+                    event.data
+                );
+
+
+            if (
+                data.type ===
+                "waiting"
+            ) {
+
+                document.getElementById(
+                    "matchCount"
+                ).textContent =
+                    "1/2";
 
             }
+
+
+            if (
+                data.type ===
+                "match_found"
+            ) {
+
+                startArena(
+                    data.players
+                );
+
+            }
+
+
+            if (
+                data.type ===
+                "state"
+            ) {
+
+                updateState(
+                    data.players
+                );
+
+            }
+
+
+            if (
+                data.type ===
+                "game_over"
+            ) {
+
+                showResult(
+                    data.winner ===
+                    myID
+                );
+
+            }
+
+
+            if (
+                data.type ===
+                "opponent_left"
+            ) {
+
+                showResult(true);
+
+            }
+
+        };
+
+}
+
+
+/* =========================
+   ARENA
+========================= */
+
+function startArena(
+    list
+) {
+
+    document.getElementById(
+        "matching"
+    ).style.display =
+        "none";
+
+
+    document.getElementById(
+        "arena"
+    ).style.display =
+        "block";
+
+
+    players = {};
+
+
+    list.forEach(
+        player => {
+
+            const ball =
+                createBall(
+                    player
+                );
+
+
+            players[player.id] = {
+
+                element:
+                    ball,
+
+                x:
+                    player.x,
+
+                y:
+                    player.y,
+
+                vx: 0,
+
+                vy: 0
+
+            };
+
+        }
+    );
+
+
+    /*
+        The first player in
+        the list is our ID
+        if their name matches.
+    */
+
+    const mine =
+        list.find(
+            player =>
+                player.name ===
+                playerName
+        );
+
+
+    if (mine) {
+
+        myID =
+            mine.id;
+
+    }
+
+
+    running = true;
+
+    requestAnimationFrame(
+        render
+    );
+
+}
+
+
+/* =========================
+   CREATE BALL
+========================= */
+
+function createBall(
+    player
+) {
+
+    const ball =
+        document.createElement(
+            "div"
+        );
+
+
+    ball.className =
+        "ball";
+
+
+    ball.style.background =
+        player.color;
+
+
+    const name =
+        document.createElement(
+            "div"
+        );
+
+
+    name.className =
+        "ball-name";
+
+
+    name.textContent =
+        player.name;
+
+
+    ball.appendChild(
+        name
+    );
+
+
+    document.getElementById(
+        "arena"
+    ).appendChild(
+        ball
+    );
+
+
+    return ball;
+
+}
+
+
+/* =========================
+   STATE
+========================= */
+
+function updateState(
+    state
+) {
+
+    state.forEach(
+        player => {
+
+            if (
+                players[player.id]
+            ) {
+
+                players[
+                    player.id
+                ].x =
+                    player.x;
+
+
+                players[
+                    player.id
+                ].y =
+                    player.y;
+
+
+                players[
+                    player.id
+                ].vx =
+                    player.vx;
+
+
+                players[
+                    player.id
+                ].vy =
+                    player.vy;
+
+            }
+
+        }
+    );
+
+}
+
+
+/* =========================
+   RENDER
+========================= */
+
+function render() {
+
+    if (!running)
+        return;
+
+
+    const arena =
+        document.getElementById(
+            "arena"
+        );
+
+
+    const centerX =
+        arena.clientWidth / 2;
+
+
+    const centerY =
+        arena.clientHeight / 2;
+
+
+    for (
+        const id in players
+    ) {
+
+        const player =
+            players[id];
+
+
+        player.element.style.left =
+            (
+                centerX +
+                player.x
+            ) +
+            "px";
+
+
+        player.element.style.top =
+            (
+                centerY +
+                player.y
+            ) +
+            "px";
+
+    }
+
+
+    requestAnimationFrame(
+        render
+    );
+
+}
+
+
+/* =========================
+   JOYSTICK
+========================= */
+
+const joystick =
+    document.getElementById(
+        "joystick"
+    );
+
+
+const stick =
+    document.getElementById(
+        "stick"
+    );
+
+
+let joystickActive =
+    false;
+
+
+let joystickCenter = 65;
+
+
+function moveJoystick(
+    x,
+    y
+) {
+
+    const dx =
+        x -
+        joystickCenter;
+
+
+    const dy =
+        y -
+        joystickCenter;
+
+
+    const distance =
+        Math.sqrt(
+            dx * dx +
+            dy * dy
+        );
+
+
+    const max =
+        45;
+
+
+    let nx = dx;
+
+    let ny = dy;
+
+
+    if (distance > max) {
+
+        nx =
+            dx /
+            distance *
+            max;
+
+        ny =
+            dy /
+            distance *
+            max;
+
+    }
+
+
+    stick.style.left =
+        (
+            joystickCenter +
+            nx
+        ) +
+        "px";
+
+
+    stick.style.top =
+        (
+            joystickCenter +
+            ny
+        ) +
+        "px";
+
+
+    if (
+        socket &&
+        socket.readyState ===
+        WebSocket.OPEN
+    ) {
+
+        socket.send(
+            JSON.stringify({
+
+                type:
+                    "input",
+
+                x:
+                    nx / max,
+
+                y:
+                    ny / max
+
+            })
+        );
+
+    }
+
+}
+
+
+joystick.addEventListener(
+    "touchstart",
+    event => {
+
+        joystickActive =
+            true;
+
+        event.preventDefault();
+
+    },
+    {
+        passive: false
+    }
+);
+
+
+joystick.addEventListener(
+    "touchmove",
+    event => {
+
+        if (!joystickActive)
+            return;
+
+
+        const rect =
+            joystick.getBoundingClientRect();
+
+
+        const touch =
+            event.touches[0];
+
+
+        moveJoystick(
+
+            touch.clientX -
+            rect.left,
+
+            touch.clientY -
+            rect.top
+
+        );
+
+
+        event.preventDefault();
+
+    },
+    {
+        passive: false
+    }
+);
+
+
+function resetJoystick() {
+
+    joystickActive =
+        false;
+
+
+    stick.style.left =
+        "50%";
+
+
+    stick.style.top =
+        "50%";
+
+}
+
+
+joystick.addEventListener(
+    "touchend",
+    resetJoystick
+);
+
+
+joystick.addEventListener(
+    "touchcancel",
+    resetJoystick
+);
+
+
+/* =========================
+   RESULT
+========================= */
+
+function showResult(
+    won
+) {
+
+    running = false;
+
+
+    document.getElementById(
+        "resultText"
+    ).textContent =
+        won
+            ? "YOU WIN!"
+            : "YOU LOSE!";
+
+
+    document.getElementById(
+        "result"
+    ).style.display =
+        "flex";
+
+
+    setTimeout(
+        () => {
+
+            document.getElementById(
+                "result"
+            ).style.display =
+                "none";
 
 
             document.getElementById(
-                "playerName"
-            ).textContent = name;
+                "arena"
+            ).style.display =
+                "none";
 
 
-            if (user.photo_url) {
+            document.getElementById(
+                "menu"
+            ).style.display =
+                "block";
 
-                document.getElementById(
-                    "pfp"
-                ).src = user.photo_url;
+
+            for (
+                const id in players
+            ) {
+
+                players[
+                    id
+                ].element.remove();
 
             }
 
-        }
 
+            players = {};
 
-        // =========================
-        // START
-        // =========================
+        },
+        2000
+    );
 
-        function startGame() {
+}
 
-            console.log(
-                "BRAWL BAAAAALLS STARTED!"
-            );
-
-        }
-
-    </script>
+</script>
 
 </body>
 
 </html>
-```
