@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>Brawl Baaaaalls</title>
+
+    <!-- Telegram -->
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+
+    <style>
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        html,
+        body {
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+        }
+
+        body {
+            background: #2196f3;
+            font-family: Arial, sans-serif;
+        }
+
+
+        /* PLAYER */
+
+        .player {
+
+            position: absolute;
+
+            top: 20px;
+            left: 20px;
+
+            display: flex;
+            align-items: center;
+
+            gap: 12px;
+
+            color: white;
+
+            font-size: 20px;
+            font-weight: bold;
+        }
+
+
+        .pfp {
+
+            width: 55px;
+            height: 55px;
+
+            border-radius: 50%;
+
+            object-fit: cover;
+
+            background: white;
+        }
+
+
+        /* BALL */
+
+        .ball {
+
+            position: absolute;
+
+            left: 50%;
+            top: 50%;
+
+            transform: translate(-50%, -50%);
+
+            width: 120px;
+            height: 120px;
+
+            background: white;
+
+            border-radius: 50%;
+
+            box-shadow:
+                0 8px 15px rgba(0, 0, 0, 0.2);
+        }
+
+
+        /* START BUTTON */
+
+        .start-button {
+
+            position: absolute;
+
+            right: 30px;
+            bottom: 30px;
+
+            width: 180px;
+            height: 70px;
+
+            border: none;
+
+            border-radius: 18px;
+
+            background: #ffd21f;
+
+            font-size: 28px;
+            font-weight: bold;
+
+            cursor: pointer;
+
+            box-shadow:
+                0 6px 0 #c9a500;
+        }
+
+
+        .start-button:active {
+
+            transform: translateY(5px);
+
+            box-shadow:
+                0 1px 0 #c9a500;
+        }
+
+    </style>
+
+</head>
+
+
+<body>
+
+
+    <!-- PLAYER -->
+
+    <div class="player">
+
+        <img
+            id="pfp"
+            class="pfp"
+            alt="Profile picture"
+        >
+
+        <span id="playerName">
+            Loading...
+        </span>
+
+    </div>
+
+
+    <!-- BALL -->
+
+    <div class="ball"></div>
+
+
+    <!-- START -->
+
+    <button
+        class="start-button"
+        onclick="startGame()"
+    >
+        START
+    </button>
+
+
+    <script>
+
+        // Telegram Web App
+
+        const tg = window.Telegram.WebApp;
+
+        tg.ready();
+
+        tg.expand();
+
+
+        // Telegram user
+
+        const user = tg.initDataUnsafe?.user;
+
+
+        if (user) {
+
+            let name = user.first_name || "Player";
+
+            if (user.last_name) {
+
+                name += " " + user.last_name;
+
+            }
+
+            document.getElementById(
+                "playerName"
+            ).textContent = name;
+
+
+            if (user.photo_url) {
+
+                document.getElementById(
+                    "pfp"
+                ).src = user.photo_url;
+
+            }
+
+        }
+        else {
+
+            document.getElementById(
+                "playerName"
+            ).textContent = "Player";
+
+        }
+
+
+        // Start button
+
+        function startGame() {
+
+            console.log(
+                "BRAWL BAAAAALLS STARTED!"
+            );
+
+        }
+
+    </script>
+
+
+</body>
+
+</html>
