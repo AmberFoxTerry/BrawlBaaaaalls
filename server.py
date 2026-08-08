@@ -60,10 +60,10 @@ class Room:
         # Player 2 = top
 
         p1.x = 0
-        p1.y = 250
+        p1.y = 170
 
         p2.x = 0
-        p2.y = -250
+        p2.y = -170
 
         while p2.color == p1.color:
             p2.color = random.choice(COLORS)
@@ -238,7 +238,7 @@ async def game_loop():
             # PLATFORM EDGE
             # =========================
 
-            PLATFORM_RADIUS = 400
+            PLATFORM_RADIUS = 300
 
             BALL_RADIUS = 35
 
