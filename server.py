@@ -419,7 +419,7 @@ async def websocket_handler(request):
                     min(1, y)
                 )
 
-                SPEED = 0.85
+                SPEED = 0.45
 
                 player.vx += x * SPEED
                 player.vy += y * SPEED
