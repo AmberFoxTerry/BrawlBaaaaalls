@@ -22,13 +22,16 @@
 <style>
 
 * {
+
     box-sizing: border-box;
+
     margin: 0;
     padding: 0;
 
     user-select: none;
     -webkit-user-select: none;
 }
+
 
 html,
 body {
@@ -44,9 +47,9 @@ body {
 }
 
 
-/* =================================
+/* =========================
    MENU
-================================= */
+========================= */
 
 #menu {
 
@@ -92,6 +95,10 @@ body {
 }
 
 
+/* =========================
+   MENU BALL
+========================= */
+
 .menu-ball {
 
     position: absolute;
@@ -105,11 +112,59 @@ body {
     transform:
         translate(-50%, -50%);
 
-    background: white;
-
     border-radius: 50%;
+
+    background: #ff4444;
 }
 
+
+/* =========================
+   COLOR BUTTONS
+========================= */
+
+.color-picker {
+
+    position: absolute;
+
+    left: 50%;
+
+    bottom: 120px;
+
+    transform:
+        translateX(-50%);
+
+    display: flex;
+
+    gap: 10px;
+}
+
+
+.color-button {
+
+    width: 32px;
+    height: 32px;
+
+    border-radius: 50%;
+
+    border: 3px solid
+        rgba(255,255,255,0.5);
+
+    padding: 0;
+}
+
+
+.color-button.selected {
+
+    border-color: white;
+
+    transform:
+        scale(1.2);
+}
+
+
+/* =========================
+   PLAY BUTTON
+========================= */
 
 .start {
 
@@ -135,9 +190,9 @@ body {
 }
 
 
-/* =================================
+/* =========================
    MATCHING
-================================= */
+========================= */
 
 #matching {
 
@@ -173,9 +228,9 @@ body {
 }
 
 
-/* =================================
+/* =========================
    ARENA
-================================= */
+========================= */
 
 #arena {
 
@@ -193,15 +248,6 @@ body {
 }
 
 
-/*
-    Camera layer.
-
-    The camera moves this layer.
-
-    The platform itself does NOT move
-    in world coordinates.
-*/
-
 #camera {
 
     position: absolute;
@@ -216,11 +262,12 @@ body {
 }
 
 
-/* =================================
+/* =========================
    PLATFORM
-================================= */
+========================= */
 
 #platform {
+
     position: absolute;
 
     width: 600px;
@@ -229,19 +276,21 @@ body {
     left: 50%;
     top: 50%;
 
-    transform: translate(-50%, -50%);
-
     border-radius: 50%;
 
     background: #666;
 
-    box-shadow: 0 0 0 8px #444;
+    box-shadow:
+        0 0 0 8px #444;
+
+    transform:
+        translate(-50%, -50%);
 }
 
 
-/* =================================
+/* =========================
    BALL
-================================= */
+========================= */
 
 .ball {
 
@@ -257,42 +306,13 @@ body {
 
     z-index: 10;
 
-    box-shadow:
-
-        inset -10px -10px 15px
-        rgba(0,0,0,0.25),
-
-        inset 8px 8px 12px
-        rgba(255,255,255,0.3);
-
     pointer-events: none;
 }
 
 
-/*
-    Stripe makes the rotation visible.
-*/
-
-.ball-stripe {
-
-    position: absolute;
-
-    width: 14px;
-    height: 70px;
-
-    left: 28px;
-    top: 0;
-
-    border-radius: 50%;
-
-    background:
-        rgba(255,255,255,0.35);
-}
-
-
-/* =================================
-   PLAYER NAME
-================================= */
+/* =========================
+   NAME
+========================= */
 
 .ball-name {
 
@@ -320,9 +340,9 @@ body {
 }
 
 
-/* =================================
+/* =========================
    JOYSTICK
-================================= */
+========================= */
 
 #joystick {
 
@@ -369,9 +389,9 @@ body {
 }
 
 
-/* =================================
+/* =========================
    RESULT
-================================= */
+========================= */
 
 #result {
 
@@ -407,9 +427,9 @@ body {
 <body>
 
 
-<!-- =================================
+<!-- =========================
      MENU
-================================= -->
+========================= -->
 
 <div id="menu">
 
@@ -427,7 +447,57 @@ body {
     </div>
 
 
-    <div class="menu-ball"></div>
+    <div
+        id="menuBall"
+        class="menu-ball"
+    ></div>
+
+
+    <div class="color-picker">
+
+        <button
+            class="color-button selected"
+            style="background:#ff4444"
+            data-color="#ff4444"
+            onclick="selectColor(this)"
+        ></button>
+
+        <button
+            class="color-button"
+            style="background:#44aaff"
+            data-color="#44aaff"
+            onclick="selectColor(this)"
+        ></button>
+
+        <button
+            class="color-button"
+            style="background:#44ff77"
+            data-color="#44ff77"
+            onclick="selectColor(this)"
+        ></button>
+
+        <button
+            class="color-button"
+            style="background:#ff44dd"
+            data-color="#ff44dd"
+            onclick="selectColor(this)"
+        ></button>
+
+        <button
+            class="color-button"
+            style="background:#ffaa22"
+            data-color="#ffaa22"
+            onclick="selectColor(this)"
+        ></button>
+
+        <button
+            class="color-button"
+            style="background:#aa66ff"
+            data-color="#aa66ff"
+            onclick="selectColor(this)"
+        ></button>
+
+    </div>
 
 
     <button
@@ -440,9 +510,9 @@ body {
 </div>
 
 
-<!-- =================================
+<!-- =========================
      MATCHING
-================================= -->
+========================= -->
 
 <div id="matching">
 
@@ -457,25 +527,18 @@ body {
 </div>
 
 
-<!-- =================================
+<!-- =========================
      ARENA
-================================= -->
+========================= -->
 
 <div id="arena">
 
-
-    <!-- CAMERA -->
-
     <div id="camera">
-
-        <!-- FIXED PLATFORM -->
 
         <div id="platform"></div>
 
     </div>
 
-
-    <!-- JOYSTICK -->
 
     <div id="joystick">
 
@@ -486,9 +549,9 @@ body {
 </div>
 
 
-<!-- =================================
+<!-- =========================
      RESULT
-================================= -->
+========================= -->
 
 <div id="result">
 
@@ -502,9 +565,9 @@ body {
 <script>
 
 
-/* =================================
+/* =========================
    TELEGRAM
-================================= */
+========================= */
 
 const tg =
     window.Telegram.WebApp;
@@ -564,9 +627,59 @@ if (user) {
 }
 
 
-/* =================================
+/* =========================
+   PLAYER COLOR
+========================= */
+
+let selectedColor =
+    "#ff4444";
+
+
+const menuBall =
+    document.getElementById(
+        "menuBall"
+    );
+
+
+menuBall.style.background =
+    selectedColor;
+
+
+function selectColor(button) {
+
+    selectedColor =
+        button.dataset.color;
+
+
+    menuBall.style.background =
+        selectedColor;
+
+
+    document
+        .querySelectorAll(
+            ".color-button"
+        )
+        .forEach(
+            element => {
+
+                element.classList.remove(
+                    "selected"
+                );
+
+            }
+        );
+
+
+    button.classList.add(
+        "selected"
+    );
+
+}
+
+
+/* =========================
    SERVER
-================================= */
+========================= */
 
 const SERVER_URL =
     "wss://brawlbaaaaalls.onrender.com/ws";
@@ -581,31 +694,22 @@ let players = {};
 let running = false;
 
 
-/* =================================
+/* =========================
    CAMERA
-================================= */
+========================= */
 
 let cameraX = 0;
 
 let cameraY = 0;
-
-
-/*
-    Maximum camera movement.
-
-    The camera moves around the
-    arena, but the platform stays
-    fixed in the world.
-*/
 
 let cameraLimitX = 0;
 
 let cameraLimitY = 0;
 
 
-/* =================================
+/* =========================
    PLAY
-================================= */
+========================= */
 
 function play() {
 
@@ -629,6 +733,10 @@ function play() {
 
     socket.onopen = () => {
 
+        /*
+            Send BOTH name and
+            selected menu color.
+        */
 
         socket.send(
             JSON.stringify({
@@ -637,7 +745,10 @@ function play() {
                     "player_info",
 
                 name:
-                    playerName
+                    playerName,
+
+                color:
+                    selectedColor
 
             })
         );
@@ -739,9 +850,9 @@ function play() {
 }
 
 
-/* =================================
+/* =========================
    START ARENA
-================================= */
+========================= */
 
 function startArena(
     list
@@ -763,36 +874,28 @@ function startArena(
 
 
     /*
-        Get actual platform size.
+        Find our player using
+        the exact selected color
+        AND name.
     */
 
-    const platform =
-        document.getElementById(
-            "platform"
+    const mine =
+        list.find(
+            player =>
+                player.name ===
+                    playerName &&
+                player.color ===
+                    selectedColor
         );
 
 
-    const platformSize =
-        platform.offsetWidth;
+    if (mine) {
 
+        myID =
+            mine.id;
 
-    cameraLimitX =
-        Math.max(
-            0,
-            platformSize / 2
-        );
+    }
 
-
-    cameraLimitY =
-        Math.max(
-            0,
-            platformSize / 2
-        );
-
-
-    /*
-        Create players.
-    */
 
     list.forEach(
         player => {
@@ -827,28 +930,20 @@ function startArena(
 
 
     /*
-        Find ourselves.
+        Camera limits.
+
+        The visible arena is
+        600 x 600.
+
+        World radius = 300.
     */
 
-    const mine =
-        list.find(
-            player =>
-                player.name ===
-                playerName
-        );
+    cameraLimitX =
+        300;
 
+    cameraLimitY =
+        300;
 
-    if (mine) {
-
-        myID =
-            mine.id;
-
-    }
-
-
-    /*
-        Start camera at player.
-    */
 
     if (players[myID]) {
 
@@ -871,9 +966,9 @@ function startArena(
 }
 
 
-/* =================================
+/* =========================
    CREATE BALL
-================================= */
+========================= */
 
 function createBall(
     player
@@ -889,23 +984,14 @@ function createBall(
         "ball";
 
 
+    /*
+        This is the color sent
+        by the server from the
+        player's menu selection.
+    */
+
     ball.style.background =
         player.color;
-
-
-    const stripe =
-        document.createElement(
-            "div"
-        );
-
-
-    stripe.className =
-        "ball-stripe";
-
-
-    ball.appendChild(
-        stripe
-    );
 
 
     const name =
@@ -939,9 +1025,9 @@ function createBall(
 }
 
 
-/* =================================
+/* =========================
    UPDATE STATE
-================================= */
+========================= */
 
 function updateState(
     state
@@ -987,9 +1073,9 @@ function updateState(
 }
 
 
-/* =================================
+/* =========================
    CAMERA + RENDER
-================================= */
+========================= */
 
 function render() {
 
@@ -1019,48 +1105,25 @@ function render() {
 
 
     /*
-        =================================
-        CAMERA FOLLOWS PLAYER
-        =================================
-
-        The platform does NOT move.
-
-        We simply offset the objects
-        relative to the camera.
-    */
-
-
-    const targetCameraX =
-        me.x;
-
-
-    const targetCameraY =
-        me.y;
-
-
-    /*
-        Smooth camera.
+        Follow our ball.
     */
 
     cameraX +=
         (
-            targetCameraX -
+            me.x -
             cameraX
         ) * 0.12;
 
 
     cameraY +=
         (
-            targetCameraY -
+            me.y -
             cameraY
         ) * 0.12;
 
 
     /*
-        Camera limit.
-
-        Don't let the camera travel
-        infinitely away from the arena.
+        Keep camera inside arena.
     */
 
     cameraX =
@@ -1083,10 +1146,6 @@ function render() {
         );
 
 
-    /*
-        Screen center.
-    */
-
     const centerX =
         arena.clientWidth / 2;
 
@@ -1096,15 +1155,13 @@ function render() {
 
 
     /*
-        Platform screen position.
+        PLATFORM
 
-        IMPORTANT:
+        The platform is fixed
+        in world coordinates.
 
-        The platform stays in WORLD
-        coordinates.
-
-        We only calculate where it
-        appears through the camera.
+        Only its screen position
+        changes because of camera.
     */
 
     const platform =
@@ -1128,7 +1185,7 @@ function render() {
 
 
     /*
-        Balls.
+        BALLS
     */
 
     for (
@@ -1154,44 +1211,6 @@ function render() {
                 cameraY
             ) + "px";
 
-
-        /*
-            Rolling effect.
-        */
-
-        const speed =
-            Math.sqrt(
-
-                player.vx *
-                player.vx +
-
-                player.vy *
-                player.vy
-
-            );
-
-
-        if (speed > 0.01) {
-
-            const angle =
-                Math.atan2(
-                    player.vy,
-                    player.vx
-                ) *
-                180 /
-                Math.PI;
-
-
-            player.element.style.transform =
-                `
-                translate(-50%, -50%)
-                rotate(
-                    ${angle + speed * 8}deg
-                )
-                `;
-
-        }
-
     }
 
 
@@ -1202,9 +1221,9 @@ function render() {
 }
 
 
-/* =================================
+/* =========================
    JOYSTICK
-================================= */
+========================= */
 
 const joystick =
     document.getElementById(
@@ -1398,9 +1417,9 @@ joystick.addEventListener(
 );
 
 
-/* =================================
+/* =========================
    RESULT
-================================= */
+========================= */
 
 function showResult(
     won
