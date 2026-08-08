@@ -1,22 +1,18 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
-
     <meta charset="UTF-8">
 
     <meta
         name="viewport"
-        content="width=device-width, initial-scale=1.0"
+        content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"
     >
 
     <title>Brawl Baaaaalls</title>
 
-    <!-- Telegram -->
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
 
     <style>
-
         * {
             box-sizing: border-box;
             margin: 0;
@@ -28,39 +24,81 @@
             width: 100%;
             height: 100%;
             overflow: hidden;
+
+            font-family: Arial, sans-serif;
         }
 
         body {
             background: #2196f3;
-            font-family: Arial, sans-serif;
+        }
+
+
+        /* ROTATE SCREEN */
+
+        #rotateScreen {
+            position: fixed;
+
+            inset: 0;
+
+            background: #2196f3;
+
+            color: white;
+
+            display: none;
+
+            align-items: center;
+            justify-content: center;
+
+            flex-direction: column;
+
+            text-align: center;
+
+            z-index: 9999;
+        }
+
+        #rotateScreen h1 {
+            font-size: 32px;
+            margin-bottom: 10px;
+        }
+
+        #rotateScreen p {
+            font-size: 18px;
+        }
+
+
+        /* GAME */
+
+        #game {
+            width: 100%;
+            height: 100%;
+
+            position: relative;
         }
 
 
         /* PLAYER */
 
         .player {
-
             position: absolute;
 
-            top: 20px;
-            left: 20px;
+            top: 15px;
+            left: 15px;
 
             display: flex;
+
             align-items: center;
 
-            gap: 12px;
+            gap: 10px;
 
             color: white;
 
-            font-size: 20px;
+            font-size: 18px;
             font-weight: bold;
         }
 
-
         .pfp {
-
-            width: 55px;
-            height: 55px;
+            width: 50px;
+            height: 50px;
 
             border-radius: 50%;
 
@@ -73,7 +111,6 @@
         /* BALL */
 
         .ball {
-
             position: absolute;
 
             left: 50%;
@@ -81,8 +118,8 @@
 
             transform: translate(-50%, -50%);
 
-            width: 120px;
-            height: 120px;
+            width: 110px;
+            height: 110px;
 
             background: white;
 
@@ -93,91 +130,152 @@
         }
 
 
-        /* START BUTTON */
+        /* START */
 
         .start-button {
-
             position: absolute;
 
-            right: 30px;
-            bottom: 30px;
+            right: 25px;
+            bottom: 25px;
 
-            width: 180px;
-            height: 70px;
+            width: 170px;
+            height: 65px;
 
             border: none;
 
-            border-radius: 18px;
+            border-radius: 16px;
 
             background: #ffd21f;
 
-            font-size: 28px;
+            font-size: 26px;
             font-weight: bold;
-
-            cursor: pointer;
 
             box-shadow:
                 0 6px 0 #c9a500;
         }
 
-
         .start-button:active {
-
             transform: translateY(5px);
 
             box-shadow:
                 0 1px 0 #c9a500;
         }
 
-    </style>
 
+        /* DESKTOP BLOCK */
+
+        @media (min-width: 700px) {
+            body {
+                background: #111;
+            }
+
+            #game {
+                display: none;
+            }
+
+            #rotateScreen {
+                display: flex;
+            }
+        }
+
+
+        /* PHONE PORTRAIT */
+
+        @media (max-width: 699px) and (orientation: portrait) {
+
+            #game {
+                display: none;
+            }
+
+            #rotateScreen {
+                display: flex;
+            }
+        }
+
+    </style>
 </head>
 
 
 <body>
 
 
-    <!-- PLAYER -->
+    <!-- ROTATION / DESKTOP MESSAGE -->
 
-    <div class="player">
+    <div id="rotateScreen">
 
-        <img
-            id="pfp"
-            class="pfp"
-            alt="Profile picture"
-        >
+        <h1>↻</h1>
 
-        <span id="playerName">
-            Loading...
-        </span>
+        <h1>Rotate your phone</h1>
+
+        <p>Brawl Baaaaalls is landscape only!</p>
 
     </div>
 
 
-    <!-- BALL -->
+    <!-- GAME -->
 
-    <div class="ball"></div>
+    <div id="game">
 
 
-    <!-- START -->
+        <!-- PLAYER -->
 
-    <button
-        class="start-button"
-        onclick="startGame()"
-    >
-        START
-    </button>
+        <div class="player">
+
+            <img
+                id="pfp"
+                class="pfp"
+                alt="Profile picture"
+            >
+
+            <span id="playerName">
+                Loading...
+            </span>
+
+        </div>
+
+
+        <!-- BALL -->
+
+        <div class="ball"></div>
+
+
+        <!-- START -->
+
+        <button
+            class="start-button"
+            onclick="startGame()"
+        >
+            START
+        </button>
+
+
+    </div>
 
 
     <script>
 
-        // Telegram Web App
-
         const tg = window.Telegram.WebApp;
+
+
+        // Telegram
 
         tg.ready();
 
         tg.expand();
+
+
+        // Try fullscreen
+
+        if (tg.requestFullscreen) {
+            tg.requestFullscreen();
+        }
+
+
+        // Try landscape
+
+        if (tg.lockOrientation) {
+            tg.lockOrientation("landscape");
+        }
 
 
         // Telegram user
@@ -190,9 +288,7 @@
             let name = user.first_name || "Player";
 
             if (user.last_name) {
-
                 name += " " + user.last_name;
-
             }
 
             document.getElementById(
@@ -208,8 +304,7 @@
 
             }
 
-        }
-        else {
+        } else {
 
             document.getElementById(
                 "playerName"
@@ -218,19 +313,13 @@
         }
 
 
-        // Start button
-
         function startGame() {
 
-            console.log(
-                "BRAWL BAAAAALLS STARTED!"
-            );
+            console.log("BRAWL BAAAAALLS!");
 
         }
 
     </script>
 
-
 </body>
-
 </html>
