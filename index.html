@@ -1,4 +1,3 @@
-```html
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -14,6 +13,7 @@
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
 
     <style>
+
         * {
             box-sizing: border-box;
             margin: 0;
@@ -24,69 +24,39 @@
         body {
             width: 100%;
             height: 100%;
+
             overflow: hidden;
+
             font-family: Arial, sans-serif;
-        }
-
-        body {
-            background: #2196f3;
-        }
-
-        /* ROTATE SCREEN */
-
-        #rotateScreen {
-            position: fixed;
-            inset: 0;
 
             background: #2196f3;
-            color: white;
-
-            display: none;
-
-            align-items: center;
-            justify-content: center;
-
-            flex-direction: column;
-
-            text-align: center;
-
-            z-index: 9999;
         }
 
-        #rotateScreen .icon {
-            font-size: 60px;
-            margin-bottom: 15px;
-        }
-
-        #rotateScreen h1 {
-            font-size: 30px;
-            margin-bottom: 10px;
-        }
-
-        #rotateScreen p {
-            font-size: 18px;
-        }
 
         /* GAME */
 
         #game {
+
             position: relative;
 
-            width: 100%;
-            height: 100%;
+            width: 100vw;
+            height: 100vh;
 
-            display: block;
+            overflow: hidden;
         }
+
 
         /* PLAYER */
 
         .player {
+
             position: absolute;
 
             top: 15px;
             left: 15px;
 
             display: flex;
+
             align-items: center;
 
             gap: 10px;
@@ -95,9 +65,13 @@
 
             font-size: 18px;
             font-weight: bold;
+
+            z-index: 10;
         }
 
+
         .pfp {
+
             width: 50px;
             height: 50px;
 
@@ -108,9 +82,11 @@
             background: white;
         }
 
+
         /* BALL */
 
         .ball {
+
             position: absolute;
 
             left: 50%;
@@ -129,83 +105,58 @@
                 0 8px 15px rgba(0, 0, 0, 0.2);
         }
 
+
         /* START BUTTON */
 
         .start-button {
+
             position: absolute;
 
-            right: 25px;
-            bottom: 25px;
+            right: 30px;
+            bottom: 30px;
 
-            width: 170px;
-            height: 65px;
+            width: 180px;
+            height: 70px;
 
             border: none;
 
-            border-radius: 16px;
+            border-radius: 18px;
 
             background: #ffd21f;
 
-            font-size: 26px;
+            font-size: 28px;
+
             font-weight: bold;
+
+            color: #222;
 
             cursor: pointer;
 
             box-shadow:
                 0 6px 0 #c9a500;
+
+            z-index: 10;
         }
 
+
         .start-button:active {
+
             transform: translateY(5px);
 
             box-shadow:
                 0 1px 0 #c9a500;
         }
 
-        /* PORTRAIT */
-
-        @media (orientation: portrait) {
-            #game {
-                display: none;
-            }
-
-            #rotateScreen {
-                display: flex;
-            }
-        }
-
-        /* LANDSCAPE */
-
-        @media (orientation: landscape) {
-            #game {
-                display: block;
-            }
-
-            #rotateScreen {
-                display: none;
-            }
-        }
     </style>
+
 </head>
+
 
 <body>
 
-    <!-- ROTATE MESSAGE -->
-
-    <div id="rotateScreen">
-
-        <div class="icon">↻</div>
-
-        <h1>Rotate your phone</h1>
-
-        <p>Brawl Baaaaalls is landscape only!</p>
-
-    </div>
-
-
-    <!-- GAME -->
 
     <div id="game">
+
 
         <!-- PLAYER -->
 
@@ -214,11 +165,11 @@
             <img
                 id="pfp"
                 class="pfp"
-                alt="Profile picture"
+                alt=""
             >
 
             <span id="playerName">
-                Loading...
+                Player
             </span>
 
         </div>
@@ -238,6 +189,7 @@
             START
         </button>
 
+
     </div>
 
 
@@ -254,20 +206,6 @@
         tg.expand();
 
 
-        // Try to make Telegram fullscreen
-
-        if (tg.requestFullscreen) {
-            tg.requestFullscreen();
-        }
-
-
-        // Try to lock landscape
-
-        if (tg.lockOrientation) {
-            tg.lockOrientation("landscape");
-        }
-
-
         // =========================
         // PLAYER
         // =========================
@@ -279,9 +217,13 @@
 
             let name = user.first_name || "Player";
 
+
             if (user.last_name) {
+
                 name += " " + user.last_name;
+
             }
+
 
             document.getElementById(
                 "playerName"
@@ -296,26 +238,23 @@
 
             }
 
-        } else {
-
-            document.getElementById(
-                "playerName"
-            ).textContent = "Player";
-
         }
 
 
         // =========================
-        // START GAME
+        // START
         // =========================
 
         function startGame() {
 
-            console.log("BRAWL BAAAAALLS STARTED!");
+            console.log(
+                "BRAWL BAAAAALLS STARTED!"
+            );
 
         }
 
     </script>
+
 
 </body>
 </html>
