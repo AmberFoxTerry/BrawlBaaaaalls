@@ -1,3 +1,4 @@
+```html
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -24,7 +25,6 @@
             width: 100%;
             height: 100%;
             overflow: hidden;
-
             font-family: Arial, sans-serif;
         }
 
@@ -32,16 +32,13 @@
             background: #2196f3;
         }
 
-
         /* ROTATE SCREEN */
 
         #rotateScreen {
             position: fixed;
-
             inset: 0;
 
             background: #2196f3;
-
             color: white;
 
             display: none;
@@ -56,8 +53,13 @@
             z-index: 9999;
         }
 
+        #rotateScreen .icon {
+            font-size: 60px;
+            margin-bottom: 15px;
+        }
+
         #rotateScreen h1 {
-            font-size: 32px;
+            font-size: 30px;
             margin-bottom: 10px;
         }
 
@@ -65,16 +67,16 @@
             font-size: 18px;
         }
 
-
         /* GAME */
 
         #game {
+            position: relative;
+
             width: 100%;
             height: 100%;
 
-            position: relative;
+            display: block;
         }
-
 
         /* PLAYER */
 
@@ -85,7 +87,6 @@
             left: 15px;
 
             display: flex;
-
             align-items: center;
 
             gap: 10px;
@@ -106,7 +107,6 @@
 
             background: white;
         }
-
 
         /* BALL */
 
@@ -129,8 +129,7 @@
                 0 8px 15px rgba(0, 0, 0, 0.2);
         }
 
-
-        /* START */
+        /* START BUTTON */
 
         .start-button {
             position: absolute;
@@ -150,6 +149,8 @@
             font-size: 26px;
             font-weight: bold;
 
+            cursor: pointer;
+
             box-shadow:
                 0 6px 0 #c9a500;
         }
@@ -161,14 +162,9 @@
                 0 1px 0 #c9a500;
         }
 
+        /* PORTRAIT */
 
-        /* DESKTOP BLOCK */
-
-        @media (min-width: 700px) {
-            body {
-                background: #111;
-            }
-
+        @media (orientation: portrait) {
             #game {
                 display: none;
             }
@@ -178,32 +174,27 @@
             }
         }
 
+        /* LANDSCAPE */
 
-        /* PHONE PORTRAIT */
-
-        @media (max-width: 699px) and (orientation: portrait) {
-
+        @media (orientation: landscape) {
             #game {
-                display: none;
+                display: block;
             }
 
             #rotateScreen {
-                display: flex;
+                display: none;
             }
         }
-
     </style>
 </head>
 
-
 <body>
 
-
-    <!-- ROTATION / DESKTOP MESSAGE -->
+    <!-- ROTATE MESSAGE -->
 
     <div id="rotateScreen">
 
-        <h1>↻</h1>
+        <div class="icon">↻</div>
 
         <h1>Rotate your phone</h1>
 
@@ -215,7 +206,6 @@
     <!-- GAME -->
 
     <div id="game">
-
 
         <!-- PLAYER -->
 
@@ -248,37 +238,39 @@
             START
         </button>
 
-
     </div>
 
 
     <script>
 
+        // =========================
+        // TELEGRAM
+        // =========================
+
         const tg = window.Telegram.WebApp;
-
-
-        // Telegram
 
         tg.ready();
 
         tg.expand();
 
 
-        // Try fullscreen
+        // Try to make Telegram fullscreen
 
         if (tg.requestFullscreen) {
             tg.requestFullscreen();
         }
 
 
-        // Try landscape
+        // Try to lock landscape
 
         if (tg.lockOrientation) {
             tg.lockOrientation("landscape");
         }
 
 
-        // Telegram user
+        // =========================
+        // PLAYER
+        // =========================
 
         const user = tg.initDataUnsafe?.user;
 
@@ -313,9 +305,13 @@
         }
 
 
+        // =========================
+        // START GAME
+        // =========================
+
         function startGame() {
 
-            console.log("BRAWL BAAAAALLS!");
+            console.log("BRAWL BAAAAALLS STARTED!");
 
         }
 
@@ -323,3 +319,4 @@
 
 </body>
 </html>
+```
