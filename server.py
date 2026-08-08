@@ -18,12 +18,12 @@ BALLS = {
 
     "bowling": {
         "speed": 0.20,
-        "push": 10.0,
+        "push": 0.6,
         "radius": 45
     },
 
     "pingpong": {
-        "speed": 0.60,
+        "speed": 1.0,
         "push": 0.6,
         "radius": 25
     }
