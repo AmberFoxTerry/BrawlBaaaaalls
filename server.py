@@ -224,7 +224,7 @@ async def game_loop():
 
                 # Bounce / push force
 
-                push = 3.5
+                push = 8
 
 
                 p1.vx -= nx * push
