@@ -3,6 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+
     <title>Brawl Baaaaalls</title>
 
     <style>
@@ -28,5 +29,18 @@
 </head>
 
 <body>
+
+<script>
+    document.addEventListener("click", async () => {
+        if (document.documentElement.requestFullscreen) {
+            try {
+                await document.documentElement.requestFullscreen();
+            } catch (error) {
+                console.log("Fullscreen unavailable");
+            }
+        }
+    }, { once: true });
+</script>
+
 </body>
 </html>
