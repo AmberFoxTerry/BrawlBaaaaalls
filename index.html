@@ -14,34 +14,62 @@
             box-sizing: border-box;
         }
 
-        html,
-        body {
+        html, body {
             width: 100%;
             height: 100%;
             overflow: hidden;
+            background: black;
         }
 
         body {
-            background: url("assets/ui/background.png") center / cover no-repeat;
+            width: 100vw;
+            height: 100vh;
+            background-image: url("assets/ui/background.png");
+            background-position: center;
+            background-size: cover;
+            background-repeat: no-repeat;
+        }
+
+        #fullscreen {
+            position: fixed;
+            inset: 0;
+            width: 100%;
+            height: 100%;
+            background: transparent;
+            border: none;
         }
     </style>
 </head>
 
 <body>
 
+<button id="fullscreen"></button>
+
 <script>
-    const tg = window.Telegram.WebApp;
+const tg = window.Telegram.WebApp;
 
-    tg.ready();
-    tg.expand();
+tg.ready();
+tg.expand();
 
+function fullscreen() {
     if (tg.requestFullscreen) {
         tg.requestFullscreen();
     }
+}
 
-    if (tg.lockOrientation) {
-        tg.lockOrientation("landscape");
-    }
+document.getElementById("fullscreen").addEventListener("click", fullscreen);
+
+tg.onEvent("fullscreenFailed", (data) => {
+    console.log("Fullscreen failed:", data);
+});
+
+tg.onEvent("fullscreenChanged", (data) => {
+    console.log("Fullscreen:", data.isFullscreen);
+});
+
+setTimeout(() => {
+    fullscreen();
+}, 500);
 </script>
 
 </body>
