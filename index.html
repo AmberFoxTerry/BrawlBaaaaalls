@@ -5,7 +5,7 @@
     <meta name="viewport"
           content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 
-    <title>Brawl Baaaaalls</title>
+    <title>Menu</title>
 
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
 
@@ -34,42 +34,51 @@
             align-items: center;
         }
 
-        #player {
-            position: relative;
-            width: 160px;
-            height: 160px;
+        #playerLink {
+            text-decoration: none;
+        }
 
-            display: flex;
-            justify-content: center;
-            align-items: center;
+        /* Whole player + weapon rig */
+        #playerRig {
+            position: relative;
+            width: 220px;
+            height: 220px;
+
+            transform-origin: center center;
 
             cursor: pointer;
         }
 
+        /* Player */
         #character {
             position: absolute;
+
             width: 120px;
             height: 120px;
-            object-fit: contain;
-
-            pointer-events: none;
-        }
-
-        #weapon {
-            position: absolute;
-            width: 64px;
-            height: 64px;
-            object-fit: contain;
 
             left: 50%;
             top: 50%;
 
-            transform-origin: center center;
+            transform: translate(-50%, -50%);
+
+            object-fit: contain;
             pointer-events: none;
         }
 
-        #playerLink {
-            text-decoration: none;
+        /* Weapon orbits OUTSIDE the player */
+        #weapon {
+            position: absolute;
+
+            width: 64px;
+            height: 64px;
+
+            left: calc(50% + 65px);
+            top: 50%;
+
+            transform: translateY(-50%);
+
+            object-fit: contain;
+            pointer-events: none;
         }
     </style>
 </head>
@@ -77,7 +86,7 @@
 <body>
 
 <a id="playerLink" href="inventory.html">
-    <div id="player">
+    <div id="playerRig">
         <img id="character" src="assets/skins/starter.png">
         <img id="weapon" src="assets/weapons/pistol.png">
     </div>
@@ -95,15 +104,7 @@ function fullscreen() {
     }
 }
 
-setTimeout(() => fullscreen(), 500);
-
-tg.onEvent("fullscreenFailed", (data) => {
-    console.log("Fullscreen failed:", data);
-});
-
-tg.onEvent("fullscreenChanged", (data) => {
-    console.log("Fullscreen:", data.isFullscreen);
-});
+setTimeout(fullscreen, 500);
 
 if (tg.BackButton) {
     tg.BackButton.hide();
@@ -115,7 +116,7 @@ if (tg.SettingsButton) {
 
 
 // -------------------------
-// Selected equipment
+// Equipment
 // -------------------------
 
 const selectedSkin =
@@ -131,14 +132,14 @@ document.getElementById("weapon").src = selectedWeapon;
 
 
 // -------------------------
-// Aim / rotation
+// Aim
 // -------------------------
 
-const player = document.getElementById("player");
-const weapon = document.getElementById("weapon");
+const playerRig = document.getElementById("playerRig");
 
-function rotateTowards(x, y) {
-    const rect = player.getBoundingClientRect();
+function aimAt(x, y) {
+
+    const rect = playerRig.getBoundingClientRect();
 
     const centerX = rect.left + rect.width / 2;
     const centerY = rect.top + rect.height / 2;
@@ -148,40 +149,44 @@ function rotateTowards(x, y) {
 
     const angle = Math.atan2(dy, dx) * 180 / Math.PI;
 
-    player.style.transform = `rotate(${angle}deg)`;
-    weapon.style.transform = `translate(-50%, -50%)`;
+    playerRig.style.transform = `rotate(${angle}deg)`;
 }
 
 
 // PC
-document.addEventListener("mousemove", (event) => {
-    rotateTowards(event.clientX, event.clientY);
+document.addEventListener("mousemove", event => {
+    aimAt(event.clientX, event.clientY);
 });
 
 
 // Phone
-document.addEventListener("touchmove", (event) => {
+document.addEventListener("touchstart", event => {
+
     if (event.touches.length > 0) {
+
         const touch = event.touches[0];
 
-        rotateTowards(
+        aimAt(
             touch.clientX,
             touch.clientY
         );
     }
+
 }, { passive: true });
 
 
-// Also aim immediately when touching
-document.addEventListener("touchstart", (event) => {
+document.addEventListener("touchmove", event => {
+
     if (event.touches.length > 0) {
+
         const touch = event.touches[0];
 
-        rotateTowards(
+        aimAt(
             touch.clientX,
             touch.clientY
         );
     }
+
 }, { passive: true });
 </script>
 
