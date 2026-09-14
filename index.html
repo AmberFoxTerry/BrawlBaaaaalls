@@ -1,3 +1,4 @@
+```html
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -35,7 +36,6 @@
         #character {
             position: absolute;
 
-            /* Change these later to wherever you want */
             left: 50%;
             top: 50%;
 
@@ -43,6 +43,8 @@
             height: 150px;
 
             transform: translate(-50%, -50%);
+
+            object-fit: contain;
 
             cursor: pointer;
             user-select: none;
@@ -66,16 +68,15 @@
 
 <body>
 
-    <!-- Character button -->
+    <!-- SELECTED SKIN -->
     <a href="inventory.html">
         <img
             id="character"
-            src="assets/ui/character.png"
-            alt="Character"
+            src="assets/skins/starter.png"
+            alt="Selected Skin"
         >
     </a>
 
-    <!-- Invisible fullscreen layer -->
     <button id="fullscreen"></button>
 
     <script>
@@ -84,7 +85,6 @@
         tg.ready();
         tg.expand();
 
-        // Hide Telegram's optional buttons
         if (tg.BackButton) {
             tg.BackButton.hide();
         }
@@ -93,13 +93,20 @@
             tg.SettingsButton.hide();
         }
 
+        // Load selected skin
+        const selectedSkin = localStorage.getItem("selectedSkin");
+
+        if (selectedSkin) {
+            document.getElementById("character").src = selectedSkin;
+        }
+
+        // Fullscreen
         function fullscreen() {
             if (tg.requestFullscreen) {
                 tg.requestFullscreen();
             }
         }
 
-        // Try fullscreen shortly after opening
         setTimeout(() => {
             fullscreen();
         }, 500);
@@ -115,3 +122,4 @@
 
 </body>
 </html>
+```
