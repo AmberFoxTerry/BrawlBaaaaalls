@@ -75,31 +75,30 @@
             justify-content: center;
         }
 
-        /* Preview rig rotates toward cursor */
+        /*
+            This wrapper keeps the character exactly the same size.
+            The weapon rotates around the character.
+        */
 
         #preview-rig {
             position: relative;
 
-            width: 320px;
-            height: 320px;
+            width: 256px;
+            height: 256px;
 
-            display: flex;
-            align-items: center;
-            justify-content: center;
+            transform-origin: center center;
         }
 
         #character {
             position: absolute;
 
+            left: 0;
+            top: 0;
+
             width: 256px;
             height: 256px;
 
             object-fit: contain;
-
-            left: 32px;
-            top: 32px;
-
-            z-index: 2;
         }
 
         #weapon {
@@ -108,14 +107,12 @@
             width: 64px;
             height: 64px;
 
+            left: 220px;
+            top: 96px;
+
             object-fit: contain;
 
-            left: 225px;
-            top: 128px;
-
-            transform: translateY(-50%);
-
-            z-index: 3;
+            pointer-events: none;
         }
 
         /* RIGHT SIDE */
@@ -209,10 +206,6 @@
             border-color: white;
         }
 
-        .item.selected {
-            border-color: white;
-        }
-
         .item img {
             max-width: 80%;
             max-height: 80%;
@@ -222,6 +215,7 @@
         /* MOBILE */
 
         @media (max-width: 700px) {
+
             #character-preview {
                 width: 35%;
             }
@@ -232,24 +226,21 @@
             }
 
             #preview-rig {
-                width: 240px;
-                height: 240px;
+                width: 180px;
+                height: 180px;
             }
 
             #character {
                 width: 180px;
                 height: 180px;
-
-                left: 30px;
-                top: 30px;
             }
 
             #weapon {
-                width: 50px;
-                height: 50px;
+                width: 64px;
+                height: 64px;
 
-                left: 170px;
-                top: 120px;
+                left: 150px;
+                top: 58px;
             }
 
             .item {
@@ -297,11 +288,17 @@
         <!-- TABS -->
         <div id="tabs">
 
-            <button class="tab active" onclick="showCategory('skins')">
+            <button
+                class="tab active"
+                onclick="showCategory('skins')"
+            >
                 Skins
             </button>
 
-            <button class="tab" onclick="showCategory('weapons')">
+            <button
+                class="tab"
+                onclick="showCategory('weapons')"
+            >
                 Weapons
             </button>
 
@@ -313,6 +310,7 @@
     </div>
 
     <script>
+
         const tg = window.Telegram.WebApp;
 
         tg.ready();
@@ -326,6 +324,11 @@
             tg.SettingsButton.hide();
         }
 
+
+        /* =========================
+           INVENTORY
+        ========================= */
+
         const rarities = [
             "Common",
             "Uncommon",
@@ -337,45 +340,16 @@
             "Special"
         ];
 
-        /* EQUIPPED ITEMS */
-
-        let selectedSkin =
-            localStorage.getItem("selectedSkin") ||
-            "assets/skins/starter.png";
-
-        let selectedWeapon =
-            localStorage.getItem("selectedWeapon") ||
-            "assets/weapons/pistol.png";
-
-        const character =
-            document.getElementById("character");
-
-        const weapon =
-            document.getElementById("weapon");
-
-        const previewRig =
-            document.getElementById("preview-rig");
-
-        function updatePreview() {
-
-            character.src = selectedSkin;
-            weapon.src = selectedWeapon;
-
-        }
-
-        /* INVENTORY ITEMS */
 
         function createItem(type, rarity) {
+
+            /* STARTER SKIN */
 
             if (type === "skins" && rarity === "Common") {
 
                 const item = document.createElement("div");
 
                 item.className = "item";
-
-                if (selectedSkin === "assets/skins/starter.png") {
-                    item.classList.add("selected");
-                }
 
                 const img = document.createElement("img");
 
@@ -386,30 +360,25 @@
 
                 item.onclick = () => {
 
-                    selectedSkin =
-                        "assets/skins/starter.png";
-
                     localStorage.setItem(
                         "selectedSkin",
-                        selectedSkin
+                        "assets/skins/starter.png"
                     );
 
                     updatePreview();
-                    showCategory("skins");
                 };
 
                 return item;
             }
+
+
+            /* PISTOL */
 
             if (type === "weapons" && rarity === "Common") {
 
                 const item = document.createElement("div");
 
                 item.className = "item";
-
-                if (selectedWeapon === "assets/weapons/pistol.png") {
-                    item.classList.add("selected");
-                }
 
                 const img = document.createElement("img");
 
@@ -420,80 +389,83 @@
 
                 item.onclick = () => {
 
-                    selectedWeapon =
-                        "assets/weapons/pistol.png";
-
                     localStorage.setItem(
                         "selectedWeapon",
-                        selectedWeapon
+                        "assets/weapons/pistol.png"
                     );
 
                     updatePreview();
-                    showCategory("weapons");
                 };
 
                 return item;
             }
 
+
             return null;
         }
 
+
         function showCategory(category) {
 
-            const container =
-                document.getElementById("items");
+            const container = document.getElementById("items");
 
             container.innerHTML = "";
 
-            /* Change active tab */
+
+            /* Active tab */
 
             document.querySelectorAll(".tab").forEach(button => {
                 button.classList.remove("active");
             });
 
+
             if (category === "skins") {
+
                 document
                     .querySelectorAll(".tab")[0]
                     .classList.add("active");
+
             } else {
+
                 document
                     .querySelectorAll(".tab")[1]
                     .classList.add("active");
+
             }
 
-            /* Create rarity sections */
+
+            /* Rarities */
 
             rarities.forEach(rarity => {
 
-                const item =
-                    createItem(category, rarity);
+                const item = createItem(category, rarity);
 
                 if (!item) {
                     return;
                 }
 
-                const section =
-                    document.createElement("div");
+
+                const section = document.createElement("div");
 
                 section.className = "rarity";
 
-                const title =
-                    document.createElement("div");
+
+                const title = document.createElement("div");
 
                 title.className = "rarity-title";
                 title.textContent = rarity;
 
-                const divider =
-                    document.createElement("div");
+
+                const divider = document.createElement("div");
 
                 divider.className = "divider";
-                divider.textContent =
-                    "____________________________";
+                divider.textContent = "____________________________";
 
-                const row =
-                    document.createElement("div");
+
+                const row = document.createElement("div");
 
                 row.className = "items-row";
+
 
                 row.appendChild(item);
 
@@ -502,15 +474,47 @@
                 section.appendChild(row);
 
                 container.appendChild(section);
+
             });
+
         }
 
-        /* AIM PREVIEW */
+
+        /* =========================
+           PREVIEW
+        ========================= */
+
+        function updatePreview() {
+
+            const skin =
+                localStorage.getItem("selectedSkin")
+                || "assets/skins/starter.png";
+
+            const weapon =
+                localStorage.getItem("selectedWeapon")
+                || "assets/weapons/pistol.png";
+
+
+            document.getElementById("character").src = skin;
+
+            document.getElementById("weapon").src = weapon;
+
+        }
+
+
+        /* =========================
+           AIMING
+        ========================= */
+
+        const rig =
+            document.getElementById("preview-rig");
+
 
         function aimAt(x, y) {
 
             const rect =
-                previewRig.getBoundingClientRect();
+                rig.getBoundingClientRect();
+
 
             const centerX =
                 rect.left + rect.width / 2;
@@ -518,15 +522,25 @@
             const centerY =
                 rect.top + rect.height / 2;
 
-            const dx = x - centerX;
-            const dy = y - centerY;
+
+            const dx =
+                x - centerX;
+
+            const dy =
+                y - centerY;
+
 
             const angle =
                 Math.atan2(dy, dx) * 180 / Math.PI;
 
-            previewRig.style.transform =
+
+            rig.style.transform =
                 `rotate(${angle}deg)`;
+
         }
+
+
+        /* PC */
 
         document.addEventListener("mousemove", event => {
 
@@ -537,70 +551,119 @@
 
         });
 
-        document.addEventListener("touchstart", event => {
 
-            if (event.touches.length > 0) {
+        /* PHONE */
 
-                aimAt(
-                    event.touches[0].clientX,
-                    event.touches[0].clientY
-                );
+        document.addEventListener(
+            "touchstart",
+            event => {
 
-            }
+                if (event.touches.length === 0) {
+                    return;
+                }
 
-        }, { passive: true });
-
-        document.addEventListener("touchmove", event => {
-
-            if (event.touches.length > 0) {
+                const touch =
+                    event.touches[0];
 
                 aimAt(
-                    event.touches[0].clientX,
-                    event.touches[0].clientY
+                    touch.clientX,
+                    touch.clientY
                 );
 
-            }
+            },
+            { passive: true }
+        );
 
-        }, { passive: true });
 
-        /* Back to menu */
+        document.addEventListener(
+            "touchmove",
+            event => {
+
+                if (event.touches.length === 0) {
+                    return;
+                }
+
+                const touch =
+                    event.touches[0];
+
+                aimAt(
+                    touch.clientX,
+                    touch.clientY
+                );
+
+            },
+            { passive: true }
+        );
+
+
+        /* =========================
+           BACK
+        ========================= */
 
         function goBack() {
-            window.location.href = "index.html";
+
+            window.location.href =
+                "index.html";
+
         }
 
-        /* Start */
+
+        /* =========================
+           START
+        ========================= */
 
         updatePreview();
+
         showCategory("skins");
 
-        /* Fullscreen */
+
+        /* =========================
+           FULLSCREEN
+        ========================= */
 
         function fullscreen() {
 
             if (tg.requestFullscreen) {
+
                 tg.requestFullscreen();
+
             }
 
         }
 
+
         setTimeout(() => {
+
             fullscreen();
+
         }, 500);
 
-        tg.onEvent("fullscreenFailed", (data) => {
-            console.log(
-                "Fullscreen failed:",
-                data
-            );
-        });
 
-        tg.onEvent("fullscreenChanged", (data) => {
-            console.log(
-                "Fullscreen:",
-                data.isFullscreen
-            );
-        });
+        tg.onEvent(
+            "fullscreenFailed",
+            (data) => {
+
+                console.log(
+                    "Fullscreen failed:",
+                    data
+                );
+
+            }
+        );
+
+
+        tg.onEvent(
+            "fullscreenChanged",
+            (data) => {
+
+                console.log(
+                    "Fullscreen:",
+                    data.isFullscreen
+                );
+
+            }
+        );
+
     </script>
 
 </body>
