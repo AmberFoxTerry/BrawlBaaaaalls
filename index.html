@@ -2,7 +2,8 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 
     <title>Brawl Baaaaalls</title>
 
@@ -10,9 +11,9 @@
 
     <style>
         * {
+            box-sizing: border-box;
             margin: 0;
             padding: 0;
-            box-sizing: border-box;
         }
 
         html, body {
@@ -23,101 +24,166 @@
         }
 
         body {
-            width: 100vw;
-            height: 100vh;
-
             background-image: url("assets/ui/background.png");
-            background-position: center;
             background-size: cover;
+            background-position: center;
             background-repeat: no-repeat;
+
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        #player {
+            position: relative;
+            width: 160px;
+            height: 160px;
+
+            display: flex;
+            justify-content: center;
+            align-items: center;
+
+            cursor: pointer;
         }
 
         #character {
             position: absolute;
+            width: 120px;
+            height: 120px;
+            object-fit: contain;
+
+            pointer-events: none;
+        }
+
+        #weapon {
+            position: absolute;
+            width: 64px;
+            height: 64px;
+            object-fit: contain;
 
             left: 50%;
             top: 50%;
 
-            width: 150px;
-            height: 150px;
-
-            transform: translate(-50%, -50%);
-
-            object-fit: contain;
-
-            cursor: pointer;
-            user-select: none;
-            -webkit-user-select: none;
+            transform-origin: center center;
+            pointer-events: none;
         }
 
-        #fullscreen {
-            position: fixed;
-            inset: 0;
-
-            width: 100%;
-            height: 100%;
-
-            background: transparent;
-            border: none;
-
-            pointer-events: none;
+        #playerLink {
+            text-decoration: none;
         }
     </style>
 </head>
 
 <body>
 
-    <!-- SELECTED SKIN -->
-    <a href="inventory.html">
-        <img
-            id="character"
-            src="assets/skins/starter.png"
-            alt="Selected Skin"
-        >
-    </a>
+<a id="playerLink" href="inventory.html">
+    <div id="player">
+        <img id="character" src="assets/skins/starter.png">
+        <img id="weapon" src="assets/weapons/pistol.png">
+    </div>
+</a>
 
-    <button id="fullscreen"></button>
+<script>
+const tg = window.Telegram.WebApp;
 
-    <script>
-        const tg = window.Telegram.WebApp;
+tg.ready();
+tg.expand();
 
-        tg.ready();
-        tg.expand();
+function fullscreen() {
+    if (tg.requestFullscreen) {
+        tg.requestFullscreen();
+    }
+}
 
-        if (tg.BackButton) {
-            tg.BackButton.hide();
-        }
+setTimeout(() => fullscreen(), 500);
 
-        if (tg.SettingsButton) {
-            tg.SettingsButton.hide();
-        }
+tg.onEvent("fullscreenFailed", (data) => {
+    console.log("Fullscreen failed:", data);
+});
 
-        // Load selected skin
-        const selectedSkin = localStorage.getItem("selectedSkin");
+tg.onEvent("fullscreenChanged", (data) => {
+    console.log("Fullscreen:", data.isFullscreen);
+});
 
-        if (selectedSkin) {
-            document.getElementById("character").src = selectedSkin;
-        }
+if (tg.BackButton) {
+    tg.BackButton.hide();
+}
 
-        // Fullscreen
-        function fullscreen() {
-            if (tg.requestFullscreen) {
-                tg.requestFullscreen();
-            }
-        }
+if (tg.SettingsButton) {
+    tg.SettingsButton.hide();
+}
 
-        setTimeout(() => {
-            fullscreen();
-        }, 500);
 
-        tg.onEvent("fullscreenFailed", (data) => {
-            console.log("Fullscreen failed:", data);
-        });
+// -------------------------
+// Selected equipment
+// -------------------------
 
-        tg.onEvent("fullscreenChanged", (data) => {
-            console.log("Fullscreen:", data.isFullscreen);
-        });
-    </script>
+const selectedSkin =
+    localStorage.getItem("selectedSkin") ||
+    "assets/skins/starter.png";
+
+const selectedWeapon =
+    localStorage.getItem("selectedWeapon") ||
+    "assets/weapons/pistol.png";
+
+document.getElementById("character").src = selectedSkin;
+document.getElementById("weapon").src = selectedWeapon;
+
+
+// -------------------------
+// Aim / rotation
+// -------------------------
+
+const player = document.getElementById("player");
+const weapon = document.getElementById("weapon");
+
+function rotateTowards(x, y) {
+    const rect = player.getBoundingClientRect();
+
+    const centerX = rect.left + rect.width / 2;
+    const centerY = rect.top + rect.height / 2;
+
+    const dx = x - centerX;
+    const dy = y - centerY;
+
+    const angle = Math.atan2(dy, dx) * 180 / Math.PI;
+
+    player.style.transform = `rotate(${angle}deg)`;
+    weapon.style.transform = `translate(-50%, -50%)`;
+}
+
+
+// PC
+document.addEventListener("mousemove", (event) => {
+    rotateTowards(event.clientX, event.clientY);
+});
+
+
+// Phone
+document.addEventListener("touchmove", (event) => {
+    if (event.touches.length > 0) {
+        const touch = event.touches[0];
+
+        rotateTowards(
+            touch.clientX,
+            touch.clientY
+        );
+    }
+}, { passive: true });
+
+
+// Also aim immediately when touching
+document.addEventListener("touchstart", (event) => {
+    if (event.touches.length > 0) {
+        const touch = event.touches[0];
+
+        rotateTowards(
+            touch.clientX,
+            touch.clientY
+        );
+    }
+}, { passive: true });
+</script>
 
 </body>
 </html>
