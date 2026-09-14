@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 
-    <title>Inventory - Brawl Baaaaalls</title>
+    <title>inventory</title>
 
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
 
@@ -267,38 +267,42 @@
         ];
 
         function createItem(type, rarity) {
-            // Only starter exists for now
+
+            // Starter skin
             if (type === "skins" && rarity === "Common") {
+
                 const item = document.createElement("div");
                 item.className = "item";
 
                 const img = document.createElement("img");
+
                 img.src = "assets/skins/starter.png";
                 img.alt = "Starter";
 
                 item.appendChild(img);
 
+                // Select starter
                 item.onclick = () => {
                     localStorage.setItem(
                         "selectedSkin",
                         "assets/skins/starter.png"
                     );
-
-                    alert("Starter selected!");
                 };
 
                 return item;
             }
 
+            // No weapons/items yet
             return null;
         }
 
         function showCategory(category) {
+
             const container = document.getElementById("items");
 
             container.innerHTML = "";
 
-            // Active button
+            // Change active tab
             document.querySelectorAll(".tab").forEach(button => {
                 button.classList.remove("active");
             });
@@ -311,6 +315,14 @@
 
             // Create rarity sections
             rarities.forEach(rarity => {
+
+                const item = createItem(category, rarity);
+
+                // Don't show empty rarities
+                if (!item) {
+                    return;
+                }
+
                 const section = document.createElement("div");
                 section.className = "rarity";
 
@@ -325,24 +337,17 @@
                 const row = document.createElement("div");
                 row.className = "items-row";
 
-                const item = createItem(category, rarity);
+                row.appendChild(item);
 
-                if (item) {
-                    row.appendChild(item);
-                }
+                section.appendChild(title);
+                section.appendChild(divider);
+                section.appendChild(row);
 
-                // Only show rarity if it contains an item
-                if (row.children.length > 0) {
-                    section.appendChild(title);
-                    section.appendChild(divider);
-                    section.appendChild(row);
-
-                    container.appendChild(section);
-                }
+                container.appendChild(section);
             });
         }
 
-        // Back to main menu
+        // Back to menu
         function goBack() {
             window.location.href = "index.html";
         }
