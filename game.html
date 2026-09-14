@@ -1,0 +1,622 @@
+<!DOCTYPE html>
+
+<html lang="en">
+
+<head>
+
+<meta charset="UTF-8">
+
+<meta
+name="viewport"
+content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"
+
+>
+
+<title>game</title>
+
+<script src="https://telegram.org/js/telegram-web-app.js"></script>
+
+<style>
+
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+html,
+body {
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+    background: black;
+}
+
+body {
+    position: relative;
+}
+
+
+/* =========================
+   PLAYERS
+========================= */
+
+.player {
+    position: absolute;
+
+    width: 120px;
+    height: 120px;
+
+    transform: translate(-50%, -50%);
+
+    pointer-events: none;
+}
+
+.player img {
+    width: 100%;
+    height: 100%;
+
+    object-fit: contain;
+}
+
+
+/* =========================
+   STATUS
+========================= */
+
+#status {
+    position: fixed;
+
+    top: 20px;
+    left: 50%;
+
+    transform: translateX(-50%);
+
+    color: white;
+
+    font-family: sans-serif;
+    font-size: 18px;
+
+    z-index: 10;
+}
+
+
+/* =========================
+   JOYSTICK
+========================= */
+
+#joystick {
+    position: fixed;
+
+    left: 30px;
+    bottom: 30px;
+
+    width: 120px;
+    height: 120px;
+
+    border: 3px solid white;
+    border-radius: 50%;
+
+    z-index: 20;
+}
+
+#stick {
+    position: absolute;
+
+    left: 50%;
+    top: 50%;
+
+    width: 50px;
+    height: 50px;
+
+    transform: translate(-50%, -50%);
+
+    background: white;
+
+    border-radius: 50%;
+}
+
+</style>
+
+</head>
+
+<body>
+
+<div id="status">
+    Connecting...
+</div>
+
+<div
+    id="player"
+    class="player"
+>
+
+```
+<img src="assets/skins/starter.png">
+```
+
+</div>
+
+<div
+    id="opponent"
+    class="player"
+>
+
+```
+<img src="assets/skins/starter.png">
+```
+
+</div>
+
+<div id="joystick">
+
+```
+<div id="stick"></div>
+```
+
+</div>
+
+<script>
+
+const tg =
+    window.Telegram.WebApp;
+
+tg.ready();
+tg.expand();
+
+if (tg.requestFullscreen) {
+    setTimeout(
+        () => tg.requestFullscreen(),
+        500
+    );
+}
+
+
+/* =========================
+   SERVER
+========================= */
+
+const SERVER =
+    "wss://brawlbaaaaalls.onrender.com/ws";
+
+
+const socket =
+    new WebSocket(SERVER);
+
+
+/* =========================
+   PLAYER
+========================= */
+
+const playerElement =
+    document.getElementById("player");
+
+const opponentElement =
+    document.getElementById("opponent");
+
+const statusElement =
+    document.getElementById("status");
+
+
+let myId = null;
+
+let roomFound = false;
+
+
+/* =========================
+   MOVEMENT
+========================= */
+
+let inputX = 0;
+let inputY = 0;
+
+
+/* PC */
+
+const keys = {};
+
+document.addEventListener(
+    "keydown",
+    event => {
+
+        keys[event.key.toLowerCase()] = true;
+
+        updateKeyboard();
+
+    }
+);
+
+document.addEventListener(
+    "keyup",
+    event => {
+
+        keys[event.key.toLowerCase()] = false;
+
+        updateKeyboard();
+
+    }
+);
+
+
+function updateKeyboard() {
+
+    let x = 0;
+    let y = 0;
+
+    if (
+        keys["a"] ||
+        keys["arrowleft"]
+    ) {
+        x -= 1;
+    }
+
+    if (
+        keys["d"] ||
+        keys["arrowright"]
+    ) {
+        x += 1;
+    }
+
+    if (
+        keys["w"] ||
+        keys["arrowup"]
+    ) {
+        y -= 1;
+    }
+
+    if (
+        keys["s"] ||
+        keys["arrowdown"]
+    ) {
+        y += 1;
+    }
+
+    inputX = x;
+    inputY = y;
+}
+
+
+/* =========================
+   SEND INPUT
+========================= */
+
+setInterval(
+    () => {
+
+        if (
+            socket.readyState !==
+            WebSocket.OPEN
+        ) {
+            return;
+        }
+
+        if (!roomFound) {
+            return;
+        }
+
+        socket.send(
+            JSON.stringify({
+
+                type: "input",
+
+                x: inputX,
+                y: inputY,
+
+                angle: 0,
+
+                shooting: false
+
+            })
+        );
+
+    },
+    1000 / 60
+);
+
+
+/* =========================
+   SERVER MESSAGES
+========================= */
+
+socket.onopen = () => {
+
+    statusElement.textContent =
+        "Finding opponent...";
+
+
+    const weapon =
+        localStorage.getItem(
+            "selectedWeapon"
+        )
+        || "assets/weapons/pistol.png";
+
+
+    socket.send(
+        JSON.stringify({
+
+            type: "player_info",
+
+            name: "Player",
+
+            weapon: "pistol"
+
+        })
+    );
+
+
+    socket.send(
+        JSON.stringify({
+
+            type: "play"
+
+        })
+    );
+};
+
+
+socket.onmessage = event => {
+
+    let data;
+
+    try {
+
+        data =
+            JSON.parse(event.data);
+
+    } catch {
+
+        return;
+
+    }
+
+
+    /* CONNECTED */
+
+    if (
+        data.type ===
+        "connected"
+    ) {
+
+        myId =
+            data.player_id;
+
+    }
+
+
+    /* WAITING */
+
+    else if (
+        data.type ===
+        "waiting"
+    ) {
+
+        statusElement.textContent =
+            "Waiting for opponent...";
+
+    }
+
+
+    /* MATCH */
+
+    else if (
+        data.type ===
+        "match_found"
+    ) {
+
+        roomFound = true;
+
+        statusElement.textContent =
+            "MATCH FOUND!";
+
+
+        setTimeout(
+            () => {
+
+                statusElement.textContent =
+                    "WASD / Arrow keys";
+
+            },
+            1000
+        );
+
+    }
+
+
+    /* STATE */
+
+    else if (
+        data.type ===
+        "state"
+    ) {
+
+        for (
+            const player of
+            data.players
+        ) {
+
+            const element =
+                player.id === myId
+                    ? playerElement
+                    : opponentElement;
+
+
+            element.style.left =
+                `${window.innerWidth / 2 + player.x}px`;
+
+            element.style.top =
+                `${window.innerHeight / 2 + player.y}px`;
+
+        }
+
+    }
+
+
+    /* OPPONENT LEFT */
+
+    else if (
+        data.type ===
+        "opponent_left"
+    ) {
+
+        roomFound = false;
+
+        statusElement.textContent =
+            "Opponent left.";
+
+    }
+
+};
+
+
+socket.onerror = () => {
+
+    statusElement.textContent =
+        "Server connection failed.";
+
+};
+
+
+socket.onclose = () => {
+
+    statusElement.textContent =
+        "Disconnected.";
+
+};
+
+
+/* =========================
+   MOBILE JOYSTICK
+========================= */
+
+const joystick =
+    document.getElementById("joystick");
+
+const stick =
+    document.getElementById("stick");
+
+let joystickActive = false;
+
+
+function joystickMove(
+    touch
+) {
+
+    const rect =
+        joystick.getBoundingClientRect();
+
+    const centerX =
+        rect.left +
+        rect.width / 2;
+
+    const centerY =
+        rect.top +
+        rect.height / 2;
+
+    let dx =
+        touch.clientX -
+        centerX;
+
+    let dy =
+        touch.clientY -
+        centerY;
+
+
+    const max =
+        35;
+
+    const distance =
+        Math.sqrt(
+            dx * dx +
+            dy * dy
+        );
+
+
+    if (distance > max) {
+
+        dx =
+            dx / distance *
+            max;
+
+        dy =
+            dy / distance *
+            max;
+
+    }
+
+
+    stick.style.left =
+        `calc(50% + ${dx}px)`;
+
+    stick.style.top =
+        `calc(50% + ${dy}px)`;
+
+
+    inputX =
+        dx / max;
+
+    inputY =
+        dy / max;
+
+}
+
+
+joystick.addEventListener(
+    "touchstart",
+    event => {
+
+        joystickActive = true;
+
+        joystickMove(
+            event.touches[0]
+        );
+
+    },
+    { passive: true }
+);
+
+
+joystick.addEventListener(
+    "touchmove",
+    event => {
+
+        if (!joystickActive) {
+            return;
+        }
+
+        joystickMove(
+            event.touches[0]
+        );
+
+    },
+    { passive: true }
+);
+
+
+function resetJoystick() {
+
+    joystickActive = false;
+
+    inputX = 0;
+    inputY = 0;
+
+    stick.style.left = "50%";
+    stick.style.top = "50%";
+
+}
+
+
+joystick.addEventListener(
+    "touchend",
+    resetJoystick
+);
+
+joystick.addEventListener(
+    "touchcancel",
+    resetJoystick
+);
+
+</script>
+
+</body>
+
+</html>
