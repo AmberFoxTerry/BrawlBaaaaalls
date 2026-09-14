@@ -1,94 +1,95 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport"
-          content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 
-    <title>Menu</title>
+<title>Brawl Baaaaalls</title>
 
-    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+<script src="https://telegram.org/js/telegram-web-app.js"></script>
 
-    <style>
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-        }
+<style>
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
 
-        html, body {
-            width: 100%;
-            height: 100%;
-            overflow: hidden;
-            background: black;
-        }
+html, body {
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+    background: black;
+}
 
-        body {
-            background-image: url("assets/ui/background.png");
-            background-size: cover;
-            background-position: center;
-            background-repeat: no-repeat;
+body {
+    background: url("assets/ui/background.png") center / cover no-repeat;
 
-            display: flex;
-            justify-content: center;
-            align-items: center;
-        }
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
 
-        #playerLink {
-            text-decoration: none;
-        }
+#playerLink {
+    text-decoration: none;
+}
 
-        /* Whole player + weapon rig */
-        #playerRig {
-            position: relative;
-            width: 220px;
-            height: 220px;
+#player {
+    position: relative;
 
-            transform-origin: center center;
+    width: 220px;
+    height: 220px;
 
-            cursor: pointer;
-        }
+    transform-origin: center;
+}
 
-        /* Player */
-        #character {
-            position: absolute;
+/* Player stays in the center */
+#character {
+    position: absolute;
 
-            width: 120px;
-            height: 120px;
+    width: 120px;
+    height: 120px;
 
-            left: 50%;
-            top: 50%;
+    left: 50%;
+    top: 50%;
 
-            transform: translate(-50%, -50%);
+    transform: translate(-50%, -50%);
 
-            object-fit: contain;
-            pointer-events: none;
-        }
+    object-fit: contain;
 
-        /* Weapon orbits OUTSIDE the player */
-        #weapon {
-            position: absolute;
+    pointer-events: none;
+}
 
-            width: 64px;
-            height: 64px;
+/* Pistol is OUTSIDE the player */
+#weapon {
+    position: absolute;
 
-            left: calc(50% + 65px);
-            top: 50%;
+    width: 64px;
+    height: 64px;
 
-            transform: translateY(-50%);
+    left: calc(50% + 65px);
+    top: 50%;
 
-            object-fit: contain;
-            pointer-events: none;
-        }
-    </style>
+    transform: translateY(-50%);
+
+    object-fit: contain;
+
+    pointer-events: none;
+}
+</style>
 </head>
 
 <body>
 
 <a id="playerLink" href="inventory.html">
-    <div id="playerRig">
-        <img id="character" src="assets/skins/starter.png">
-        <img id="weapon" src="assets/weapons/pistol.png">
+    <div id="player">
+
+        <img id="character"
+             src="assets/skins/starter.png">
+
+        <img id="weapon"
+             src="assets/weapons/pistol.png">
+
     </div>
 </a>
 
@@ -98,13 +99,9 @@ const tg = window.Telegram.WebApp;
 tg.ready();
 tg.expand();
 
-function fullscreen() {
-    if (tg.requestFullscreen) {
-        tg.requestFullscreen();
-    }
+if (tg.requestFullscreen) {
+    setTimeout(() => tg.requestFullscreen(), 500);
 }
-
-setTimeout(fullscreen, 500);
 
 if (tg.BackButton) {
     tg.BackButton.hide();
@@ -116,55 +113,61 @@ if (tg.SettingsButton) {
 
 
 // -------------------------
-// Equipment
+// Load equipment
 // -------------------------
 
-const selectedSkin =
-    localStorage.getItem("selectedSkin") ||
-    "assets/skins/starter.png";
+const skin =
+    localStorage.getItem("selectedSkin")
+    || "assets/skins/starter.png";
 
-const selectedWeapon =
-    localStorage.getItem("selectedWeapon") ||
-    "assets/weapons/pistol.png";
+const weapon =
+    localStorage.getItem("selectedWeapon")
+    || "assets/weapons/pistol.png";
 
-document.getElementById("character").src = selectedSkin;
-document.getElementById("weapon").src = selectedWeapon;
+document.getElementById("character").src = skin;
+document.getElementById("weapon").src = weapon;
 
 
 // -------------------------
 // Aim
 // -------------------------
 
-const playerRig = document.getElementById("playerRig");
+const player =
+    document.getElementById("player");
 
 function aimAt(x, y) {
 
-    const rect = playerRig.getBoundingClientRect();
+    const rect = player.getBoundingClientRect();
 
-    const centerX = rect.left + rect.width / 2;
-    const centerY = rect.top + rect.height / 2;
+    const centerX =
+        rect.left + rect.width / 2;
+
+    const centerY =
+        rect.top + rect.height / 2;
 
     const dx = x - centerX;
     const dy = y - centerY;
 
-    const angle = Math.atan2(dy, dx) * 180 / Math.PI;
+    const angle =
+        Math.atan2(dy, dx) * 180 / Math.PI;
 
-    playerRig.style.transform = `rotate(${angle}deg)`;
+    player.style.transform =
+        `rotate(${angle}deg)`;
 }
 
 
 // PC
-document.addEventListener("mousemove", event => {
-    aimAt(event.clientX, event.clientY);
+document.addEventListener("mousemove", e => {
+    aimAt(e.clientX, e.clientY);
 });
 
 
 // Phone
-document.addEventListener("touchstart", event => {
+document.addEventListener("touchstart", e => {
 
-    if (event.touches.length > 0) {
+    if (e.touches.length > 0) {
 
-        const touch = event.touches[0];
+        const touch = e.touches[0];
 
         aimAt(
             touch.clientX,
@@ -175,11 +178,11 @@ document.addEventListener("touchstart", event => {
 }, { passive: true });
 
 
-document.addEventListener("touchmove", event => {
+document.addEventListener("touchmove", e => {
 
-    if (event.touches.length > 0) {
+    if (e.touches.length > 0) {
 
-        const touch = event.touches[0];
+        const touch = e.touches[0];
 
         aimAt(
             touch.clientX,
