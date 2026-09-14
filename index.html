@@ -51,6 +51,15 @@ const tg = window.Telegram.WebApp;
 tg.ready();
 tg.expand();
 
+// Hide Telegram buttons
+if (tg.BackButton) {
+    tg.BackButton.hide();
+}
+
+if (tg.SettingsButton) {
+    tg.SettingsButton.hide();
+}
+
 function fullscreen() {
     if (tg.requestFullscreen) {
         tg.requestFullscreen();
