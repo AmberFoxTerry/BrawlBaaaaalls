@@ -1,8 +1,10 @@
+```html
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+
     <title>Brawl Baaaaalls</title>
 
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
@@ -24,62 +26,94 @@
         body {
             width: 100vw;
             height: 100vh;
+
             background-image: url("assets/ui/background.png");
             background-position: center;
             background-size: cover;
             background-repeat: no-repeat;
         }
 
+        #character {
+            position: absolute;
+
+            /* Change these later to wherever you want */
+            left: 50%;
+            top: 50%;
+
+            width: 150px;
+            height: 150px;
+
+            transform: translate(-50%, -50%);
+
+            cursor: pointer;
+            user-select: none;
+            -webkit-user-select: none;
+        }
+
         #fullscreen {
             position: fixed;
             inset: 0;
+
             width: 100%;
             height: 100%;
+
             background: transparent;
             border: none;
+
+            pointer-events: none;
         }
     </style>
 </head>
 
 <body>
 
-<button id="fullscreen"></button>
+    <!-- Character button -->
+    <a href="inventory.html">
+        <img
+            id="character"
+            src="assets/ui/character.png"
+            alt="Character"
+        >
+    </a>
 
-<script>
-const tg = window.Telegram.WebApp;
+    <!-- Invisible fullscreen layer -->
+    <button id="fullscreen"></button>
 
-tg.ready();
-tg.expand();
+    <script>
+        const tg = window.Telegram.WebApp;
 
-// Hide Telegram buttons
-if (tg.BackButton) {
-    tg.BackButton.hide();
-}
+        tg.ready();
+        tg.expand();
 
-if (tg.SettingsButton) {
-    tg.SettingsButton.hide();
-}
+        // Hide Telegram's optional buttons
+        if (tg.BackButton) {
+            tg.BackButton.hide();
+        }
 
-function fullscreen() {
-    if (tg.requestFullscreen) {
-        tg.requestFullscreen();
-    }
-}
+        if (tg.SettingsButton) {
+            tg.SettingsButton.hide();
+        }
 
-document.getElementById("fullscreen").addEventListener("click", fullscreen);
+        function fullscreen() {
+            if (tg.requestFullscreen) {
+                tg.requestFullscreen();
+            }
+        }
 
-tg.onEvent("fullscreenFailed", (data) => {
-    console.log("Fullscreen failed:", data);
-});
+        // Try fullscreen shortly after opening
+        setTimeout(() => {
+            fullscreen();
+        }, 500);
 
-tg.onEvent("fullscreenChanged", (data) => {
-    console.log("Fullscreen:", data.isFullscreen);
-});
+        tg.onEvent("fullscreenFailed", (data) => {
+            console.log("Fullscreen failed:", data);
+        });
 
-setTimeout(() => {
-    fullscreen();
-}, 500);
-</script>
+        tg.onEvent("fullscreenChanged", (data) => {
+            console.log("Fullscreen:", data.isFullscreen);
+        });
+    </script>
 
 </body>
 </html>
+```
