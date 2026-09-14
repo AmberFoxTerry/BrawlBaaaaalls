@@ -33,20 +33,28 @@
             font-family: Arial, sans-serif;
         }
 
+
+        /* Back button */
+
         #back {
             position: absolute;
             top: 20px;
             left: 20px;
 
-            font-size: 32px;
             color: white;
             text-decoration: none;
+
+            font-size: 32px;
 
             z-index: 20;
         }
 
+
+        /* Tabs */
+
         #tabs {
             position: absolute;
+
             top: 20px;
             left: 50%;
 
@@ -57,6 +65,8 @@
 
             font-size: 24px;
             font-weight: bold;
+
+            z-index: 10;
         }
 
         .tab {
@@ -68,21 +78,25 @@
             opacity: 1;
         }
 
+
+        /* Inventory */
+
         #inventory {
             position: absolute;
 
-            top: 90px;
-            left: 50%;
-            transform: translateX(-50%);
-
-            width: 90%;
-            height: calc(100% - 110px);
+            top: 85px;
+            left: 30px;
+            right: 30px;
+            bottom: 30px;
 
             overflow-y: auto;
             overflow-x: hidden;
 
             padding: 20px;
         }
+
+
+        /* Rarity */
 
         .rarity {
             margin-bottom: 30px;
@@ -91,8 +105,12 @@
         .rarityTitle {
             font-size: 22px;
             font-weight: bold;
+
             margin-bottom: 15px;
         }
+
+
+        /* Items */
 
         .items {
             display: flex;
@@ -104,59 +122,69 @@
             width: 100px;
 
             text-align: center;
+
             cursor: pointer;
         }
 
-        .item img {
+        .itemImage {
             width: 80px;
             height: 80px;
 
             object-fit: contain;
 
             display: block;
-            margin: auto;
+
+            margin: 0 auto;
         }
 
         .itemName {
             margin-top: 8px;
 
+            width: 100%;
+
             font-size: 16px;
             font-weight: bold;
 
-            word-break: break-word;
+            text-align: center;
         }
 
-        .selected {
+        .selected .itemImage {
             outline: 2px solid white;
             outline-offset: 5px;
         }
 
 
-        /* Preview */
+        /* Player preview */
 
         #preview {
             position: absolute;
 
-            right: 30px;
-            bottom: 30px;
+            right: 35px;
+            bottom: 35px;
 
-            width: 180px;
-            height: 180px;
+            width: 220px;
+            height: 220px;
 
-            display: flex;
-            justify-content: center;
-            align-items: center;
+            transform-origin: center center;
+
+            pointer-events: none;
         }
 
         #previewCharacter {
             position: absolute;
 
-            width: 130px;
-            height: 130px;
+            width: 120px;
+            height: 120px;
+
+            left: 50%;
+            top: 50%;
+
+            transform: translate(-50%, -50%);
 
             object-fit: contain;
-            pointer-events: none;
         }
+
+        /* Weapon outside player */
 
         #previewWeapon {
             position: absolute;
@@ -164,14 +192,12 @@
             width: 64px;
             height: 64px;
 
-            object-fit: contain;
-
-            left: 50%;
+            left: calc(50% + 65px);
             top: 50%;
 
-            transform-origin: center center;
+            transform: translateY(-50%);
 
-            pointer-events: none;
+            object-fit: contain;
         }
     </style>
 </head>
@@ -188,9 +214,14 @@
 <div id="inventory"></div>
 
 
+<!-- Player + weapon preview -->
+
 <div id="preview">
-    <img id="previewCharacter" src="assets/skins/starter.png">
-    <img id="previewWeapon" src="assets/weapons/pistol.png">
+    <img id="previewCharacter"
+         src="assets/skins/starter.png">
+
+    <img id="previewWeapon"
+         src="assets/weapons/pistol.png">
 </div>
 
 
@@ -206,15 +237,7 @@ function fullscreen() {
     }
 }
 
-setTimeout(() => fullscreen(), 500);
-
-tg.onEvent("fullscreenFailed", (data) => {
-    console.log("Fullscreen failed:", data);
-});
-
-tg.onEvent("fullscreenChanged", (data) => {
-    console.log("Fullscreen:", data.isFullscreen);
-});
+setTimeout(fullscreen, 500);
 
 if (tg.BackButton) {
     tg.BackButton.hide();
@@ -229,29 +252,21 @@ if (tg.SettingsButton) {
 // Equipment
 // -------------------------
 
-const defaultSkin = "assets/skins/starter.png";
-const defaultWeapon = "assets/weapons/pistol.png";
-
 let selectedSkin =
-    localStorage.getItem("selectedSkin") || defaultSkin;
+    localStorage.getItem("selectedSkin") ||
+    "assets/skins/starter.png";
 
 let selectedWeapon =
-    localStorage.getItem("selectedWeapon") || defaultWeapon;
-
-const inventory = document.getElementById("inventory");
-
-const previewCharacter =
-    document.getElementById("previewCharacter");
-
-const previewWeapon =
-    document.getElementById("previewWeapon");
+    localStorage.getItem("selectedWeapon") ||
+    "assets/weapons/pistol.png";
 
 
 // -------------------------
-// Items
+// Inventory data
 // -------------------------
 
 const data = {
+
     skins: {
         Common: [
             {
@@ -273,36 +288,67 @@ const data = {
 
 
 // -------------------------
-// Create item
+// Elements
+// -------------------------
+
+const inventory =
+    document.getElementById("inventory");
+
+const preview =
+    document.getElementById("preview");
+
+const previewCharacter =
+    document.getElementById("previewCharacter");
+
+const previewWeapon =
+    document.getElementById("previewWeapon");
+
+
+// -------------------------
+// Create inventory item
 // -------------------------
 
 function createItem(type, item) {
-    const element = document.createElement("div");
+
+    const element =
+        document.createElement("div");
 
     element.className = "item";
 
-    const image = document.createElement("img");
+
+    const image =
+        document.createElement("img");
+
+    image.className = "itemImage";
     image.src = item.image;
 
-    const name = document.createElement("div");
+
+    const name =
+        document.createElement("div");
+
     name.className = "itemName";
     name.textContent = item.name;
+
 
     element.appendChild(image);
     element.appendChild(name);
 
-    const selected =
+
+    const isSelected =
         type === "skins"
             ? selectedSkin === item.image
             : selectedWeapon === item.image;
 
-    if (selected) {
+
+    if (isSelected) {
         element.classList.add("selected");
     }
+
 
     element.onclick = () => {
 
         if (type === "skins") {
+
             selectedSkin = item.image;
 
             localStorage.setItem(
@@ -311,6 +357,7 @@ function createItem(type, item) {
             );
 
         } else {
+
             selectedWeapon = item.image;
 
             localStorage.setItem(
@@ -319,16 +366,19 @@ function createItem(type, item) {
             );
         }
 
+
         updatePreview();
+
         showCategory(type);
     };
+
 
     return element;
 }
 
 
 // -------------------------
-// Show category
+// Display category
 // -------------------------
 
 function showCategory(type) {
@@ -336,6 +386,7 @@ function showCategory(type) {
     inventory.innerHTML = "";
 
     const rarities = data[type];
+
 
     for (const rarity in rarities) {
 
@@ -345,21 +396,34 @@ function showCategory(type) {
             continue;
         }
 
-        const section = document.createElement("div");
+
+        const section =
+            document.createElement("div");
+
         section.className = "rarity";
 
-        const title = document.createElement("div");
+
+        const title =
+            document.createElement("div");
+
         title.className = "rarityTitle";
         title.textContent = rarity;
 
-        const itemContainer = document.createElement("div");
+
+        const itemContainer =
+            document.createElement("div");
+
         itemContainer.className = "items";
 
+
         items.forEach(item => {
+
             itemContainer.appendChild(
                 createItem(type, item)
             );
+
         });
+
 
         section.appendChild(title);
         section.appendChild(itemContainer);
@@ -370,60 +434,84 @@ function showCategory(type) {
 
 
 // -------------------------
-// Preview
+// Update preview
 // -------------------------
 
 function updatePreview() {
 
-    previewCharacter.src = selectedSkin;
-    previewWeapon.src = selectedWeapon;
+    previewCharacter.src =
+        selectedSkin;
+
+    previewWeapon.src =
+        selectedWeapon;
 }
 
 
 // -------------------------
-// Preview aiming
+// Aim preview
 // -------------------------
 
-const preview = document.getElementById("preview");
+function aimPreview(x, y) {
 
-function rotatePreview(x, y) {
+    const rect =
+        preview.getBoundingClientRect();
 
-    const rect = preview.getBoundingClientRect();
+    const centerX =
+        rect.left + rect.width / 2;
 
-    const centerX = rect.left + rect.width / 2;
-    const centerY = rect.top + rect.height / 2;
+    const centerY =
+        rect.top + rect.height / 2;
+
 
     const dx = x - centerX;
     const dy = y - centerY;
 
+
     const angle =
         Math.atan2(dy, dx) * 180 / Math.PI;
 
+
     preview.style.transform =
         `rotate(${angle}deg)`;
-
-    previewWeapon.style.transform =
-        "translate(-50%, -50%)";
 }
 
 
 // PC
-document.addEventListener("mousemove", (event) => {
-    rotatePreview(
+document.addEventListener("mousemove", event => {
+
+    aimPreview(
         event.clientX,
         event.clientY
     );
+
 });
 
 
 // Phone
-document.addEventListener("touchmove", (event) => {
+document.addEventListener("touchstart", event => {
 
     if (event.touches.length > 0) {
 
-        const touch = event.touches[0];
+        const touch =
+            event.touches[0];
 
-        rotatePreview(
+        aimPreview(
+            touch.clientX,
+            touch.clientY
+        );
+    }
+
+}, { passive: true });
+
+
+document.addEventListener("touchmove", event => {
+
+    if (event.touches.length > 0) {
+
+        const touch =
+            event.touches[0];
+
+        aimPreview(
             touch.clientX,
             touch.clientY
         );
@@ -442,6 +530,7 @@ const skinsTab =
 const weaponsTab =
     document.getElementById("weaponsTab");
 
+
 skinsTab.onclick = () => {
 
     skinsTab.classList.add("active");
@@ -449,6 +538,7 @@ skinsTab.onclick = () => {
 
     showCategory("skins");
 };
+
 
 weaponsTab.onclick = () => {
 
@@ -464,6 +554,7 @@ weaponsTab.onclick = () => {
 // -------------------------
 
 updatePreview();
+
 showCategory("skins");
 </script>
 
