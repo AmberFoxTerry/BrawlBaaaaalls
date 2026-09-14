@@ -5,30 +5,59 @@ import uuid
 from aiohttp import web
 
 
-waiting_player = None
+# ============================================================
+# WEAPONS
+# ============================================================
+
+WEAPONS = {
+
+    "pistol": {
+        "name": "Pistol",
+        "rarity": "Common",
+
+        "damage": 20,
+        "fire_rate": 4.0,
+        "bullet_speed": 10.0,
+        "range": 500,
+        "spread": 0
+    },
+
+}
+
+
+# ============================================================
+# MATCHMAKING
+# ============================================================
+
+waiting_players = []
 rooms = {}
 
 
-BALLS = {
-    "normal": {
-        "speed": 0.45,
-        "push": 8.0,
-        "radius": 35
-    },
+def weapon_power(weapon_id):
 
-    "bowling": {
-        "speed": 0.20,
-        "push": 0.6,
-        "radius": 45
-    },
+    weapon = WEAPONS.get(weapon_id)
 
-    "pingpong": {
-        "speed": 1.0,
-        "push": 0.6,
-        "radius": 25
-    }
-}
+    if weapon is None:
+        return 0
 
+    # Simple power calculation.
+    # We can balance this properly later.
+    damage = weapon["damage"]
+    fire_rate = weapon["fire_rate"]
+    bullet_speed = weapon["bullet_speed"]
+    weapon_range = weapon["range"]
+
+    return (
+        damage * 2
+        + fire_rate * 10
+        + bullet_speed * 2
+        + weapon_range * 0.05
+    )
+
+
+# ============================================================
+# PLAYER
+# ============================================================
 
 class Player:
 
@@ -38,42 +67,73 @@ class Player:
 
         self.websocket = websocket
 
-        self.room = None
-
         self.name = "Player"
 
-        self.ball_type = "normal"
+        self.equipped_weapon = "pistol"
+
+        self.room = None
 
         self.x = 0
         self.y = 0
 
-        self.vx = 0
-        self.vy = 0
+        self.angle = 0
+
+        self.input_x = 0
+        self.input_y = 0
+
+        self.shooting = False
 
         self.alive = True
 
 
+    @property
+    def weapon(self):
+
+        return WEAPONS[self.equipped_weapon]
+
+
+    @property
+    def power(self):
+
+        return weapon_power(
+            self.equipped_weapon
+        )
+
+
+# ============================================================
+# ROOM
+# ============================================================
+
 class Room:
 
-    def __init__(self, p1, p2):
+    def __init__(self, player1, player2):
 
         self.id = str(uuid.uuid4())
 
-        self.players = [p1, p2]
+        self.players = [
+            player1,
+            player2
+        ]
 
-        p1.room = self
-        p2.room = self
+        player1.room = self
+        player2.room = self
 
-        # Player 1 = bottom
-        p1.x = 0
-        p1.y = 170
+        # Spawn positions.
+        # Map will replace these later.
 
-        # Player 2 = top
-        p2.x = 0
-        p2.y = -170
+        player1.x = -100
+        player1.y = 0
 
+        player2.x = 100
+        player2.y = 0
+
+        self.started = False
         self.finished = False
 
+
+# ============================================================
+# NETWORK
+# ============================================================
 
 async def send(player, data):
 
@@ -98,47 +158,49 @@ async def broadcast(room, data):
     )
 
 
-async def make_match(p1, p2):
+# ============================================================
+# MATCHMAKING
+# ============================================================
 
-    room = Room(p1, p2)
-
-    rooms[room.id] = room
-
-    await broadcast(
-        room,
-        {
-            "type": "match_found",
-
-            "players": [
-
-                {
-                    "id": p1.id,
-                    "name": p1.name,
-                    "ball": p1.ball_type,
-                    "x": p1.x,
-                    "y": p1.y
-                },
-
-                {
-                    "id": p2.id,
-                    "name": p2.name,
-                    "ball": p2.ball_type,
-                    "x": p2.x,
-                    "y": p2.y
-                }
-
-            ]
-        }
-    )
+MATCH_POWER_RANGE = 20
 
 
 async def matchmaking(player):
 
-    global waiting_player
+    # Remove ourselves from the queue
+    if player in waiting_players:
+        waiting_players.remove(player)
 
-    if waiting_player is None:
 
-        waiting_player = player
+    best_match = None
+    best_difference = None
+
+
+    for other in waiting_players:
+
+        if other.room is not None:
+            continue
+
+        difference = abs(
+            player.power -
+            other.power
+        )
+
+        if difference > MATCH_POWER_RANGE:
+            continue
+
+        if (
+            best_difference is None
+            or difference < best_difference
+        ):
+
+            best_match = other
+            best_difference = difference
+
+
+    if best_match is None:
+
+        waiting_players.append(player)
 
         await send(
             player,
@@ -149,15 +211,65 @@ async def matchmaking(player):
 
         return
 
-    other = waiting_player
 
-    waiting_player = None
+    waiting_players.remove(best_match)
 
-    await make_match(
-        other,
+    await create_room(
+        best_match,
         player
     )
 
+
+# ============================================================
+# CREATE ROOM
+# ============================================================
+
+async def create_room(player1, player2):
+
+    room = Room(
+        player1,
+        player2
+    )
+
+    rooms[room.id] = room
+
+    room.started = True
+
+
+    await broadcast(
+        room,
+        {
+            "type": "match_found",
+
+            "room_id": room.id,
+
+            "players": [
+
+                {
+                    "id": player.id,
+                    "name": player.name,
+
+                    "weapon":
+                        player.equipped_weapon,
+
+                    "weapon_power":
+                        player.power,
+
+                    "x": player.x,
+                    "y": player.y
+
+                }
+
+                for player in room.players
+
+            ]
+        }
+    )
+
+
+# ============================================================
+# GAME LOOP
+# ============================================================
 
 async def game_loop():
 
@@ -168,163 +280,74 @@ async def game_loop():
             if room.finished:
                 continue
 
-            p1 = room.players[0]
-            p2 = room.players[1]
 
-            # =========================
+            # ------------------------------------------------
             # MOVEMENT
-            # =========================
+            # ------------------------------------------------
 
             for player in room.players:
 
-                player.x += player.vx
-                player.y += player.vy
+                if not player.alive:
+                    continue
 
-                player.vx *= 0.90
-                player.vy *= 0.90
+                speed = 4.0
 
-            # =========================
-            # BALL COLLISION
-            # =========================
-
-            dx = p2.x - p1.x
-            dy = p2.y - p1.y
-
-            distance = (
-                dx * dx +
-                dy * dy
-            ) ** 0.5
-
-            r1 = BALLS[
-                p1.ball_type
-            ]["radius"]
-
-            r2 = BALLS[
-                p2.ball_type
-            ]["radius"]
-
-            collision_distance = r1 + r2
-
-            if (
-                distance > 0
-                and distance < collision_distance
-            ):
-
-                nx = dx / distance
-                ny = dy / distance
-
-                overlap = (
-                    collision_distance -
-                    distance
+                player.x += (
+                    player.input_x *
+                    speed
                 )
 
-                p1.x -= nx * overlap / 2
-                p1.y -= ny * overlap / 2
+                player.y += (
+                    player.input_y *
+                    speed
+                )
 
-                p2.x += nx * overlap / 2
-                p2.y += ny * overlap / 2
 
-                push1 = BALLS[
-                    p1.ball_type
-                ]["push"]
+            # ------------------------------------------------
+            # STATE
+            # ------------------------------------------------
 
-                push2 = BALLS[
-                    p2.ball_type
-                ]["push"]
+            await broadcast(
+                room,
+                {
+                    "type": "state",
 
-                p1.vx -= nx * push1
-                p1.vy -= ny * push1
+                    "players": [
 
-                p2.vx += nx * push2
-                p2.vy += ny * push2
-
-            # =========================
-            # PLATFORM
-            # =========================
-
-            PLATFORM_RADIUS = 300
-
-            for player in room.players:
-
-                ball_radius = BALLS[
-                    player.ball_type
-                ]["radius"]
-
-                distance = (
-                    player.x ** 2 +
-                    player.y ** 2
-                ) ** 0.5
-
-                if distance > (
-                    PLATFORM_RADIUS -
-                    ball_radius
-                ):
-
-                    player.alive = False
-
-                    room.finished = True
-
-                    winner = (
-                        p2
-                        if player == p1
-                        else p1
-                    )
-
-                    await broadcast(
-                        room,
                         {
-                            "type": "game_over",
+                            "id":
+                                player.id,
 
-                            "winner":
-                                winner.id,
+                            "x":
+                                player.x,
 
-                            "loser":
-                                player.id
+                            "y":
+                                player.y,
+
+                            "angle":
+                                player.angle,
+
+                            "alive":
+                                player.alive
+
                         }
-                    )
 
-            # =========================
-            # GAME STATE
-            # =========================
+                        for player
+                        in room.players
 
-            if not room.finished:
+                    ]
+                }
+            )
 
-                await broadcast(
-                    room,
-                    {
-                        "type": "state",
-
-                        "players": [
-
-                            {
-                                "id":
-                                    player.id,
-
-                                "x":
-                                    player.x,
-
-                                "y":
-                                    player.y,
-
-                                "vx":
-                                    player.vx,
-
-                                "vy":
-                                    player.vy
-
-                            }
-
-                            for player
-                            in room.players
-
-                        ]
-                    }
-                )
 
         await asyncio.sleep(
             1 / 60
         )
 
+
+# ============================================================
+# WEBSOCKET
+# ============================================================
 
 async def websocket_handler(request):
 
@@ -332,7 +355,22 @@ async def websocket_handler(request):
 
     await websocket.prepare(request)
 
+
     player = Player(websocket)
+
+
+    # Tell client its ID.
+
+    await send(
+        player,
+        {
+            "type": "connected",
+
+            "player_id":
+                player.id
+        }
+    )
+
 
     try:
 
@@ -342,8 +380,8 @@ async def websocket_handler(request):
                 message.type !=
                 web.WSMsgType.TEXT
             ):
-
                 continue
+
 
             try:
 
@@ -355,46 +393,59 @@ async def websocket_handler(request):
 
                 continue
 
-            # =========================
-            # PLAYER INFO
-            # =========================
 
-            if data.get("type") == "player_info":
+            message_type = data.get(
+                "type"
+            )
+
+
+            # =================================================
+            # PLAYER INFO
+            # =================================================
+
+            if message_type == "player_info":
 
                 player.name = data.get(
                     "name",
                     "Player"
                 )
 
-                requested_ball = data.get(
-                    "ball",
-                    "normal"
+
+                weapon = data.get(
+                    "weapon",
+                    "pistol"
                 )
 
-                if requested_ball in BALLS:
 
-                    player.ball_type = (
-                        requested_ball
+                # Never trust unknown weapons.
+
+                if weapon in WEAPONS:
+
+                    player.equipped_weapon = weapon
+
+
+            # =================================================
+            # PLAY
+            # =================================================
+
+            elif message_type == "play":
+
+                if player.room is None:
+
+                    await matchmaking(
+                        player
                     )
 
-            # =========================
-            # PLAY
-            # =========================
 
-            elif data.get("type") == "play":
-
-                await matchmaking(
-                    player
-                )
-
-            # =========================
+            # =================================================
             # INPUT
-            # =========================
+            # =================================================
 
-            elif data.get("type") == "input":
+            elif message_type == "input":
 
                 if player.room is None:
                     continue
+
 
                 try:
 
@@ -412,34 +463,59 @@ async def websocket_handler(request):
                         )
                     )
 
+                    angle = float(
+                        data.get(
+                            "angle",
+                            0
+                        )
+                    )
+
+                    shooting = bool(
+                        data.get(
+                            "shooting",
+                            False
+                        )
+                    )
+
                 except Exception:
 
                     continue
 
-                x = max(
+
+                # Clamp movement.
+
+                player.input_x = max(
                     -1,
                     min(1, x)
                 )
 
-                y = max(
+                player.input_y = max(
                     -1,
                     min(1, y)
                 )
 
-                speed = BALLS[
-                    player.ball_type
-                ]["speed"]
 
-                player.vx += x * speed
-                player.vy += y * speed
+                player.angle = angle
+
+                player.shooting = shooting
+
 
     finally:
 
-        global waiting_player
+        # ----------------------------------------------------
+        # MATCHMAKING QUEUE
+        # ----------------------------------------------------
 
-        if waiting_player == player:
+        if player in waiting_players:
 
-            waiting_player = None
+            waiting_players.remove(
+                player
+            )
+
+
+        # ----------------------------------------------------
+        # ROOM
+        # ----------------------------------------------------
 
         if player.room:
 
@@ -457,26 +533,37 @@ async def websocket_handler(request):
                         }
                     )
 
+                    other.room = None
+
+
             rooms.pop(
                 room.id,
                 None
             )
 
+
     return websocket
 
+
+# ============================================================
+# SERVER START
+# ============================================================
 
 async def start():
 
     app = web.Application()
+
 
     app.router.add_get(
         "/ws",
         websocket_handler
     )
 
+
     runner = web.AppRunner(app)
 
     await runner.setup()
+
 
     site = web.TCPSite(
         runner,
@@ -484,13 +571,20 @@ async def start():
         8080
     )
 
+
     await site.start()
 
+
     print(
-        "Brawl Baaaaalls server running!"
+        "Shooter server running!"
     )
+
 
     await game_loop()
 
+
+# ============================================================
+# RUN
+# ============================================================
 
 asyncio.run(start())
