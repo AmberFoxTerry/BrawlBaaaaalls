@@ -30,6 +30,10 @@ body {
     align-items: center;
 }
 
+/* =========================
+   PLAYER
+========================= */
+
 #playerLink {
     text-decoration: none;
 }
@@ -44,6 +48,7 @@ body {
 }
 
 /* Player stays in the center */
+
 #character {
     position: absolute;
 
@@ -61,6 +66,7 @@ body {
 }
 
 /* Pistol is OUTSIDE the player */
+
 #weapon {
     position: absolute;
 
@@ -76,24 +82,163 @@ body {
 
     pointer-events: none;
 }
+
+
+/* =========================
+   EVENTS
+========================= */
+
+#events {
+    position: fixed;
+
+    bottom: 25px;
+    left: 50%;
+
+    transform: translateX(-50%);
+
+    z-index: 20;
+}
+
+.event-button {
+    background: #222;
+    color: white;
+
+    border: 2px solid white;
+    border-radius: 8px;
+
+    padding: 12px 20px;
+
+    font-size: 18px;
+    font-weight: bold;
+
+    cursor: pointer;
+
+    white-space: nowrap;
+}
+
+.event-button:active {
+    background: white;
+    color: black;
+}
+
+
+/* =========================
+   PLAY BUTTON
+========================= */
+
+#play {
+    position: fixed;
+
+    right: 25px;
+    bottom: 25px;
+
+    z-index: 20;
+
+    width: 140px;
+    height: 60px;
+
+    background: #222;
+    color: white;
+
+    border: 2px solid white;
+    border-radius: 8px;
+
+    font-size: 24px;
+    font-weight: bold;
+
+    cursor: pointer;
+}
+
+#play:active {
+    background: white;
+    color: black;
+}
+
+
+/* =========================
+   MOBILE
+========================= */
+
+@media (max-width: 700px) {
+
+    #events {
+        bottom: 20px;
+    }
+
+    .event-button {
+        font-size: 14px;
+        padding: 10px 14px;
+    }
+
+    #play {
+        right: 15px;
+        bottom: 20px;
+
+        width: 100px;
+        height: 50px;
+
+        font-size: 20px;
+    }
+}
 </style>
 </head>
 
 <body>
 
+
+<!-- =========================
+     PLAYER
+========================= -->
+
 <a id="playerLink" href="inventory.html">
+
     <div id="player">
 
-        <img id="character"
-             src="assets/skins/starter.png">
+        <img
+            id="character"
+            src="assets/skins/starter.png"
+        >
 
-        <img id="weapon"
-             src="assets/weapons/pistol.png">
+        <img
+            id="weapon"
+            src="assets/weapons/pistol.png"
+        >
 
     </div>
+
 </a>
 
+
+<!-- =========================
+     EVENTS
+========================= -->
+
+<div id="events">
+
+    <button
+        class="event-button"
+        onclick="multiplayerTest()"
+    >
+        1v1 - Multiplayer test
+    </button>
+
+</div>
+
+
+<!-- =========================
+     PLAY
+========================= -->
+
+<button
+    id="play"
+    onclick="playGame()"
+>
+    Play
+</button>
+
+
 <script>
+
 const tg = window.Telegram.WebApp;
 
 tg.ready();
@@ -112,9 +257,9 @@ if (tg.SettingsButton) {
 }
 
 
-// -------------------------
-// Load equipment
-// -------------------------
+/* =========================
+   LOAD EQUIPMENT
+========================= */
 
 const skin =
     localStorage.getItem("selectedSkin")
@@ -128,16 +273,18 @@ document.getElementById("character").src = skin;
 document.getElementById("weapon").src = weapon;
 
 
-// -------------------------
-// Aim
-// -------------------------
+/* =========================
+   AIM
+========================= */
 
 const player =
     document.getElementById("player");
 
+
 function aimAt(x, y) {
 
-    const rect = player.getBoundingClientRect();
+    const rect =
+        player.getBoundingClientRect();
 
     const centerX =
         rect.left + rect.width / 2;
@@ -145,8 +292,11 @@ function aimAt(x, y) {
     const centerY =
         rect.top + rect.height / 2;
 
-    const dx = x - centerX;
-    const dy = y - centerY;
+    const dx =
+        x - centerX;
+
+    const dy =
+        y - centerY;
 
     const angle =
         Math.atan2(dy, dx) * 180 / Math.PI;
@@ -156,23 +306,32 @@ function aimAt(x, y) {
 }
 
 
-// PC
+/* PC */
+
 document.addEventListener("mousemove", e => {
-    aimAt(e.clientX, e.clientY);
+
+    aimAt(
+        e.clientX,
+        e.clientY
+    );
+
 });
 
 
-// Phone
+/* PHONE */
+
 document.addEventListener("touchstart", e => {
 
     if (e.touches.length > 0) {
 
-        const touch = e.touches[0];
+        const touch =
+            e.touches[0];
 
         aimAt(
             touch.clientX,
             touch.clientY
         );
+
     }
 
 }, { passive: true });
@@ -182,15 +341,36 @@ document.addEventListener("touchmove", e => {
 
     if (e.touches.length > 0) {
 
-        const touch = e.touches[0];
+        const touch =
+            e.touches[0];
 
         aimAt(
             touch.clientX,
             touch.clientY
         );
+
     }
 
 }, { passive: true });
+
+
+/* =========================
+   BUTTONS
+========================= */
+
+function multiplayerTest() {
+
+    // Nothing yet :3
+
+}
+
+
+function playGame() {
+
+    // Nothing yet :3
+
+}
+
 </script>
 
 </body>
